@@ -2,81 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Design Master Switchboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Master Page</title>
     <style>
-        body { margin: 0; padding: 0; display: flex; height: 100vh; font-family: sans-serif; overflow: hidden; }
-        
-        /* Sidebar Styling */
-        .sidebar {
-            width: 250px;
-            background: #2c3e50;
-            color: white;
-            overflow-y: auto;
+        /* Reset & Layout */
+        body {
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #ddd;
+            overflow: hidden;
         }
-        .sidebar h2 { padding: 20px; font-size: 1.2rem; margin: 0; background: #1a252f; }
-        
-        /* Navigation Buttons */
-        .nav-btn {
-            padding: 15px 20px;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            color: #ecf0f1;
-            text-align: left;
-            border-bottom: 1px solid #34495e;
-            transition: background 0.2s;
-        }
-        .nav-btn:hover { background: #34495e; }
-        .nav-btn.active { background: #3498db; font-weight: bold; }
 
-        /* Main Preview Area */
-        .preview-area { flex: 1; background: #ecf0f1; position: relative; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* Header Bar */
+        .switcher-header {
+            height: 60px;
+            background-color: #222;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Spreads items apart */
+            padding: 0 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .title { font-weight: bold; font-size: 1.1rem; }
+
+        /* Dropdown Styling */
+        .theme-select {
+            padding: 8px 12px;
+            font-size: 16px; /* Prevents zoom on iPhone */
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Preview Area */
+        .preview-container {
+            flex-grow: 1;
+            width: 100%;
+            background-color: #e5e5e5;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Mobile Adjustment */
+        @media (max-width: 400px) {
+            .title { display: none; } /* Hide title on small phones */
+            .switcher-header { justify-content: center; }
+        }
     </style>
 </head>
 <body>
-<div class="sidebar">
-        <h2>Theme Versions</h2>
-<button class="nav-btn" onclick="loadPage(this, '1.html')">Version 1</button>
-        <button class="nav-btn" onclick="loadPage(this, '2.html')">Version 2</button>
-        <button class="nav-btn" onclick="loadPage(this, '3.html')">Version 3</button>
-        <button class="nav-btn" onclick="loadPage(this, '4.html')">Version 4</button>
-        <button class="nav-btn" onclick="loadPage(this, '5.html')">Version 5</button>
-	<button class="nav-btn" onclick="loadPage(this, '6.html')">Version 6</button>
-	<button class="nav-btn" onclick="loadPage(this, '7.html')">Version 7</button>
-	<button class="nav-btn" onclick="loadPage(this, '8.html')">Version 8</button>
-	<button class="nav-btn" onclick="loadPage(this, '9.html')">Version 9</button>
-	<button class="nav-btn" onclick="loadPage(this, '10.html')">Version 10</button>
-	<button class="nav-btn" onclick="loadPage(this, '11.html')">Version 11</button>
-	<button class="nav-btn" onclick="loadPage(this, '12.html')">Version 12</button>
-	<button class="nav-btn" onclick="loadPage(this, '13.html')">Version 13</button>
-	<button class="nav-btn" onclick="loadPage(this, '14.html')">Version 14</button>
-	<button class="nav-btn" onclick="loadPage(this, '15.html')">Version 15</button>
-	<button class="nav-btn" onclick="loadPage(this, '16.html')">Version 16</button>
 
+    <div class="switcher-header">
+        <span class="title">Website Versions</span>
+        
+        <select id="themeSelector" class="theme-select" onchange="changePage(this.value)">
+            </select>
     </div>
 
-
-
-    <div class="preview-area">
-        <iframe id="viewer" src="1.html"></iframe>
+    <div class="preview-container">
+        <iframe id="viewer" src=""></iframe>
     </div>
 
     <script>
-        function loadPage(btn, url) {
-            // Update the iframe source
-            document.getElementById('viewer').src = url;
+        // --- CONFIGURATION ---
+        const totalPages = 16; 
+        const selector = document.getElementById('themeSelector');
+        const viewer = document.getElementById('viewer');
+
+        // 1. Generate the Dropdown Options (1.html to 16.html)
+        for (let i = 1; i <= totalPages; i++) {
+            let fileName = i + ".html"; // Creates "1.html", "2.html"
             
-            // Handle active class for styling
-            let buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            let option = document.createElement('option');
+            option.value = fileName;
+            option.text = "Page Version " + i; // Label in the menu
+            selector.appendChild(option);
+        }
+
+        // 2. Check if URL has a hash (e.g. master.html#5.html) to remember position
+        // If not, default to 1.html
+        let initialPage = "1.html";
+        if(window.location.hash) {
+            // Remove the '#' symbol to get the filename
+            initialPage = window.location.hash.substring(1);
+            // Update the dropdown to match
+            selector.value = initialPage;
+        }
+        
+        // Load the page
+        viewer.src = initialPage;
+
+        // 3. Function to handle changes
+        function changePage(fileName) {
+            viewer.src = fileName;
+            // Update the browser URL so you can copy/paste the link
+            window.location.hash = fileName;
         }
     </script>
 
 </body>
 </html>
-
