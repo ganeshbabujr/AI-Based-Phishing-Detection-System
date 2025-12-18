@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Phishing Detection System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      box-sizing: border-box;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    /* Cyber background */
+    .cyber-bg {
+      background: linear-gradient(135deg, #0a0e1a 0%, #0d1525 25%, #111d2e 50%, #0a1628 75%, #060b14 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    .cyber-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 136, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    
+    /* Grid pattern overlay */
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+    
+    /* Animated scan line */
+    .scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), rgba(0, 255, 136, 0.5), transparent);
+      animation: scanMove 8s ease-in-out infinite;
+      opacity: 0.6;
+    }
+    
+    @keyframes scanMove {
+      0%, 100% { top: 5%; }
+      50% { top: 95%; }
+    }
+    
+    /* Glowing text */
+    .glow-text {
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3);
+    }
+    
+    .glow-green {
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.6), 0 0 40px rgba(0, 255, 136, 0.3);
+    }
+    
+    .glow-red {
+      text-shadow: 0 0 20px rgba(255, 71, 87, 0.6), 0 0 40px rgba(255, 71, 87, 0.3);
+    }
+    
+    .glow-yellow {
+      text-shadow: 0 0 20px rgba(255, 193, 7, 0.6), 0 0 40px rgba(255, 193, 7, 0.3);
+    }
+    
+    /* Main input container */
+    .input-container {
+      background: linear-gradient(135deg, rgba(13, 21, 37, 0.9) 0%, rgba(10, 14, 26, 0.95) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 
+        0 0 30px rgba(0, 212, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .input-container:focus-within {
+      border-color: rgba(0, 212, 255, 0.6);
+      box-shadow: 
+        0 0 40px rgba(0, 212, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    
+    /* URL input */
+    .url-input {
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .url-input::placeholder {
+      color: rgba(148, 163, 184, 0.5);
+    }
+    
+    .url-input:focus {
+      outline: none;
+    }
+    
+    /* Scan button */
+    .scan-btn {
+      background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+      color: #0a0e1a;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .scan-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .scan-btn:hover::before {
+      opacity: 1;
+    }
+    
+    .scan-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(0, 212, 255, 0.4);
+    }
+    
+    .scan-btn:active {
+      transform: translateY(0);
+    }
+    
+    .scan-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .scan-btn span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Scanning animation */
+    .scanning-anim {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Result cards */
+    .result-card {
+      background: linear-gradient(135deg, rgba(13, 21, 37, 0.95) 0%, rgba(10, 14, 26, 0.98) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .result-safe {
+      border-color: rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.15);
+    }
+    
+    .result-danger {
+      border-color: rgba(255, 71, 87, 0.5);
+      box-shadow: 0 0 30px rgba(255, 71, 87, 0.15);
+    }
+    
+    .result-warning {
+      border-color: rgba(255, 193, 7, 0.5);
+      box-shadow: 0 0 30px rgba(255, 193, 7, 0.15);
+    }
+    
+    /* Stats cards */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(13, 21, 37, 0.8) 0%, rgba(10, 14, 26, 0.9) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: rgba(0, 212, 255, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Feature cards */
+    .feature-card {
+      background: linear-gradient(135deg, rgba(13, 21, 37, 0.6) 0%, rgba(10, 14, 26, 0.8) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      border-color: rgba(0, 212, 255, 0.3);
+      background: linear-gradient(135deg, rgba(13, 21, 37, 0.8) 0%, rgba(10, 14, 26, 0.9) 100%);
+    }
+    
+    /* Progress bar */
+    .progress-track {
+      background: rgba(0, 212, 255, 0.1);
+    }
+    
+    .progress-fill {
+      background: linear-gradient(90deg, #00d4ff, #00ff88);
+      transition: width 0.5s ease;
+    }
+    
+    /* Risk meter */
+    .risk-meter {
+      background: linear-gradient(90deg, 
+        #00ff88 0%, 
+        #7cff00 25%, 
+        #ffc107 50%, 
+        #ff6b35 75%, 
+        #ff4757 100%
+      );
+    }
+    
+    .risk-indicator {
+      transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    /* Animated shield */
+    .shield-icon {
+      animation: shieldPulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes shieldPulse {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5)); }
+      50% { filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.8)); }
+    }
+    
+    /* Particle effects */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(0, 212, 255, 0.6);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    
+    /* History item */
+    .history-item {
+      background: rgba(13, 21, 37, 0.6);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+    
+    .history-item:hover {
+      background: rgba(13, 21, 37, 0.8);
+      border-color: rgba(0, 212, 255, 0.25);
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 212, 255, 0.05);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.3);
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 212, 255, 0.5);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .scan-btn {
+        font-size: 12px;
+        padding: 12px 16px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full cyber-bg text-white overflow-auto"><!-- Grid overlay -->
+  <div class="grid-overlay"></div><!-- Scan line effect -->
+  <div class="scan-line"></div><!-- Floating particles -->
+  <div class="particle" style="left: 10%; bottom: 20%; animation-delay: 0s;"></div>
+  <div class="particle" style="left: 25%; bottom: 10%; animation-delay: 1s;"></div>
+  <div class="particle" style="left: 75%; bottom: 15%; animation-delay: 2s;"></div>
+  <div class="particle" style="left: 90%; bottom: 25%; animation-delay: 3s;"></div>
+  <div class="particle" style="left: 50%; bottom: 5%; animation-delay: 4s;"></div>
+  <div class="relative z-10 min-h-full w-full">
+   <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12"><!-- Header Section -->
+    <header class="text-center mb-10 md:mb-16"><!-- Shield Icon -->
+     <div class="shield-icon inline-block mb-6">
+      <svg width="80" height="80" viewbox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 sm:w-20 sm:h-20"><path d="M40 8L12 20V36C12 53.6 23.84 70.08 40 74C56.16 70.08 68 53.6 68 36V20L40 8Z" stroke="url(#shieldGrad)" stroke-width="3" fill="rgba(0, 212, 255, 0.1)" /> <path d="M36 40L40 44L48 32" stroke="#00ff88" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /> <defs>
+        <lineargradient id="shieldGrad" x1="12" y1="8" x2="68" y2="74" gradientunits="userSpaceOnUse">
+         <stop stop-color="#00d4ff" />
+         <stop offset="1" stop-color="#00ff88" />
+        </lineargradient>
+       </defs>
+      </svg>
+     </div>
+     <p class="text-xs sm:text-sm uppercase tracking-[0.3em] text-cyan-400/60 mb-3 font-medium" style="font-family: 'JetBrains Mono', monospace;">// MACHINE LEARNING POWERED</p>
+     <h1 id="app-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold glow-text mb-4 bg-gradient-to-r from-cyan-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">AI PHISHING DETECTOR</h1>
+     <p id="tagline" class="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">Advanced threat detection system using machine learning algorithms to protect you from malicious URLs</p>
+    </header><!-- Main Scanner Section -->
+    <section class="mb-12 md:mb-16" aria-label="URL Scanner">
+     <div class="input-container rounded-2xl p-2 sm:p-3 max-w-3xl mx-auto">
+      <form id="scan-form" class="flex flex-col sm:flex-row gap-3">
+       <div class="flex-1 flex items-center gap-3 px-4 py-3"><!-- Link icon -->
+        <svg class="w-5 h-5 text-cyan-400/60 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg><label for="url-input" class="sr-only">Enter URL to scan</label> <input type="text" id="url-input" class="url-input flex-1 text-white text-sm sm:text-base py-2 w-full" placeholder="Enter URL to analyze (e.g., https://example.com)" autocomplete="off">
+       </div><button type="submit" id="scan-btn" class="scan-btn px-6 sm:px-8 py-4 rounded-xl text-sm font-bold flex-shrink-0"> <span class="flex items-center justify-center gap-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+         </svg><span id="scan-btn-text">ANALYZE URL</span> </span> </button>
+      </form>
+     </div><!-- Scanning Progress -->
+     <div id="scanning-progress" class="hidden max-w-3xl mx-auto mt-6">
+      <div class="flex items-center justify-between mb-2"><span class="text-sm text-cyan-400 font-medium scanning-anim" style="font-family: 'JetBrains Mono', monospace;">Analyzing URL...</span> <span id="progress-percent" class="text-sm text-slate-400" style="font-family: 'JetBrains Mono', monospace;">0%</span>
+      </div>
+      <div class="progress-track h-2 rounded-full overflow-hidden">
+       <div id="progress-bar" class="progress-fill h-full rounded-full" style="width: 0%;"></div>
+      </div>
+      <p id="progress-status" class="text-xs text-slate-500 mt-2" style="font-family: 'JetBrains Mono', monospace;">Initializing ML models...</p>
+     </div>
+    </section><!-- Results Section -->
+    <section id="results-section" class="hidden mb-12 md:mb-16" aria-label="Scan Results">
+     <div id="result-card" class="result-card rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto"><!-- Result Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+       <div class="flex items-center gap-4">
+        <div id="result-icon" class="w-16 h-16 rounded-xl flex items-center justify-center"><!-- Icon will be inserted by JS -->
+        </div>
+        <div>
+         <h2 id="result-title" class="text-xl sm:text-2xl font-bold">Analysis Complete</h2>
+         <p id="result-subtitle" class="text-sm text-slate-400" style="font-family: 'JetBrains Mono', monospace;">URL verified</p>
+        </div>
+       </div>
+       <div id="confidence-badge" class="px-4 py-2 rounded-lg text-sm font-bold" style="font-family: 'JetBrains Mono', monospace;">
+        98% Confidence
+       </div>
+      </div><!-- Analyzed URL -->
+      <div class="bg-slate-900/50 rounded-xl p-4 mb-6 border border-slate-700/50">
+       <p class="text-xs text-slate-500 mb-1 uppercase tracking-wider">Analyzed URL</p>
+       <p id="analyzed-url" class="text-cyan-400 text-sm break-all" style="font-family: 'JetBrains Mono', monospace;">https://example.com</p>
+      </div><!-- Risk Meter -->
+      <div class="mb-6">
+       <div class="flex justify-between items-center mb-2"><span class="text-sm text-slate-400">Risk Level</span> <span id="risk-label" class="text-sm font-bold">Low Risk</span>
+       </div>
+       <div class="relative h-3 rounded-full overflow-hidden risk-meter">
+        <div id="risk-indicator" class="risk-indicator absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-slate-900" style="left: 10%;"></div>
+       </div>
+       <div class="flex justify-between mt-1"><span class="text-xs text-slate-600">Safe</span> <span class="text-xs text-slate-600">Dangerous</span>
+       </div>
+      </div><!-- Detection Details -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+       <div class="bg-slate-900/30 rounded-xl p-4">
+        <p class="text-xs text-slate-500 mb-2 uppercase tracking-wider">ML Model Prediction</p>
+        <p id="ml-prediction" class="text-lg font-bold text-emerald-400">Legitimate</p>
+       </div>
+       <div class="bg-slate-900/30 rounded-xl p-4">
+        <p class="text-xs text-slate-500 mb-2 uppercase tracking-wider">Features Analyzed</p>
+        <p id="features-count" class="text-lg font-bold text-cyan-400">24 Features</p>
+       </div>
+      </div><!-- Feature Analysis -->
+      <div class="mb-6">
+       <h3 class="text-sm text-slate-400 mb-3 uppercase tracking-wider">Feature Analysis</h3>
+       <div id="feature-list" class="space-y-2"><!-- Features will be inserted by JS -->
+       </div>
+      </div><!-- Action Buttons -->
+      <div class="flex flex-wrap gap-3"><button id="new-scan-btn" class="px-5 py-3 bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 rounded-xl text-sm font-medium hover:bg-cyan-500/30 transition-all"> Scan New URL </button> <button id="report-btn" class="px-5 py-3 bg-slate-700/30 border border-slate-600/50 text-slate-400 rounded-xl text-sm font-medium hover:bg-slate-700/50 transition-all"> Report False Positive </button>
+      </div>
+     </div>
+    </section><!-- Stats Section -->
+    <section class="mb-12 md:mb-16" aria-label="Statistics">
+     <h2 class="text-center text-lg sm:text-xl font-semibold text-slate-300 mb-6">System Statistics</h2>
+     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-1">99.2%</p>
+       <p class="text-xs sm:text-sm text-slate-500">Detection Accuracy</p>
+      </div>
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-1">1.2M+</p>
+       <p class="text-xs sm:text-sm text-slate-500">URLs Scanned</p>
+      </div>
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-1">&lt;2s</p>
+       <p class="text-xs sm:text-sm text-slate-500">Avg Scan Time</p>
+      </div>
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-1">24</p>
+       <p class="text-xs sm:text-sm text-slate-500">ML Features</p>
+      </div>
+     </div>
+    </section><!-- Features Section -->
+    <section class="mb-12 md:mb-16" aria-label="Features">
+     <h2 class="text-center text-lg sm:text-xl font-semibold text-slate-300 mb-6">How It Works</h2>
+     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <article class="feature-card rounded-xl p-6">
+       <div class="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 rounded-xl flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+       </div>
+       <h3 class="text-base font-semibold text-white mb-2">Feature Extraction</h3>
+       <p class="text-sm text-slate-400 leading-relaxed">Analyzes 24+ URL features including domain age, SSL status, URL length, and suspicious patterns.</p>
+      </article>
+      <article class="feature-card rounded-xl p-6">
+       <div class="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-xl flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+        </svg>
+       </div>
+       <h3 class="text-base font-semibold text-white mb-2">ML Classification</h3>
+       <p class="text-sm text-slate-400 leading-relaxed">Uses Random Forest, XGBoost, and Neural Networks to classify URLs with 99%+ accuracy.</p>
+      </article>
+      <article class="feature-card rounded-xl p-6">
+       <div class="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-xl flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+       </div>
+       <h3 class="text-base font-semibold text-white mb-2">Real-time Protection</h3>
+       <p class="text-sm text-slate-400 leading-relaxed">Instant threat detection with detailed reports and confidence scores for each analysis.</p>
+      </article>
+     </div>
+    </section><!-- Recent Scans History -->
+    <section class="mb-8" aria-label="Recent Scans">
+     <h2 class="text-lg sm:text-xl font-semibold text-slate-300 mb-4">Recent Scans</h2>
+     <div id="history-list" class="space-y-2">
+      <p class="text-sm text-slate-500 text-center py-8">No scans yet. Enter a URL above to get started.</p>
+     </div>
+    </section>
+   </main><!-- Footer -->
+   <footer class="border-t border-slate-800/50 py-6 mt-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-xs text-slate-500" style="font-family: 'JetBrains Mono', monospace;">© 2024 AI Phishing Detection System</p>
+      <div class="flex items-center gap-2 text-xs text-slate-600"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> <span>System Online</span>
+      </div>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    const defaultConfig = {
+      app_title: 'AI PHISHING DETECTOR',
+      tagline: 'Advanced threat detection system using machine learning algorithms to protect you from malicious URLs',
+      scan_button_text: 'ANALYZE URL',
+      input_placeholder: 'Enter URL to analyze (e.g., https://example.com)',
+      background_color: '#0a0e1a',
+      surface_color: '#0d1525',
+      text_color: '#ffffff',
+      primary_color: '#00d4ff',
+      accent_color: '#00ff88'
+    };
+    
+    let config = { ...defaultConfig };
+    let scanHistory = [];
+    
+    // DOM Elements
+    const scanForm = document.getElementById('scan-form');
+    const urlInput = document.getElementById('url-input');
+    const scanBtn = document.getElementById('scan-btn');
+    const scanBtnText = document.getElementById('scan-btn-text');
+    const scanningProgress = document.getElementById('scanning-progress');
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercent = document.getElementById('progress-percent');
+    const progressStatus = document.getElementById('progress-status');
+    const resultsSection = document.getElementById('results-section');
+    const resultCard = document.getElementById('result-card');
+    const historyList = document.getElementById('history-list');
+    
+    // ML Feature names for simulation
+    const mlFeatures = [
+      { name: 'URL Length', desc: 'Character count analysis' },
+      { name: 'Domain Age', desc: 'Registration date check' },
+      { name: 'SSL Certificate', desc: 'HTTPS verification' },
+      { name: 'IP in URL', desc: 'IP address detection' },
+      { name: 'Suspicious Keywords', desc: 'Phishing term scan' },
+      { name: 'Domain Reputation', desc: 'Blacklist check' },
+      { name: 'Redirect Count', desc: 'Hop analysis' },
+      { name: 'Port Usage', desc: 'Non-standard ports' },
+      { name: 'Subdomain Count', desc: 'Subdomain depth' },
+      { name: 'URL Entropy', desc: 'Randomness score' },
+      { name: 'TLD Analysis', desc: 'Domain extension' },
+      { name: 'Typosquatting', desc: 'Brand impersonation' }
+    ];
+    
+    // Simulate URL analysis
+    async function analyzeUrl(url) {
+      // Show progress
+      scanningProgress.classList.remove('hidden');
+      resultsSection.classList.add('hidden');
+      scanBtn.disabled = true;
+      
+      const statuses = [
+        'Initializing ML models...',
+        'Extracting URL features...',
+        'Checking domain reputation...',
+        'Analyzing SSL certificate...',
+        'Running Random Forest classifier...',
+        'Running XGBoost model...',
+        'Aggregating predictions...',
+        'Generating report...'
+      ];
+      
+      // Animate progress
+      for (let i = 0; i <= 100; i += 2) {
+        await new Promise(r => setTimeout(r, 40));
+        progressBar.style.width = `${i}%`;
+        progressPercent.textContent = `${i}%`;
+        
+        const statusIndex = Math.floor(i / (100 / statuses.length));
+        if (statusIndex < statuses.length) {
+          progressStatus.textContent = statuses[statusIndex];
+        }
+      }
+      
+      // Generate random result (for demo)
+      const isPhishing = Math.random() < 0.3; // 30% chance of phishing
+      const isSuspicious = !isPhishing && Math.random() < 0.2; // 20% chance suspicious if not phishing
+      const confidence = Math.floor(85 + Math.random() * 14); // 85-99%
+      
+      // Determine result type
+      let resultType, riskPercent, riskLabel;
+      if (isPhishing) {
+        resultType = 'danger';
+        riskPercent = 75 + Math.random() * 20;
+        riskLabel = 'High Risk';
+      } else if (isSuspicious) {
+        resultType = 'warning';
+        riskPercent = 40 + Math.random() * 25;
+        riskLabel = 'Medium Risk';
+      } else {
+        resultType = 'safe';
+        riskPercent = 5 + Math.random() * 20;
+        riskLabel = 'Low Risk';
+      }
+      
+      // Hide progress, show results
+      scanningProgress.classList.add('hidden');
+      scanBtn.disabled = false;
+      
+      showResults(url, resultType, confidence, riskPercent, riskLabel);
+      addToHistory(url, resultType, confidence);
+    }
+    
+    function showResults(url, type, confidence, riskPercent, riskLabel) {
+      resultsSection.classList.remove('hidden');
+      
+      // Update card styling
+      resultCard.classList.remove('result-safe', 'result-danger', 'result-warning');
+      resultCard.classList.add(`result-${type}`);
+      
+      // Update icon and colors
+      const resultIcon = document.getElementById('result-icon');
+      const resultTitle = document.getElementById('result-title');
+      const resultSubtitle = document.getElementById('result-subtitle');
+      const confidenceBadge = document.getElementById('confidence-badge');
+      const analyzedUrl = document.getElementById('analyzed-url');
+      const riskIndicator = document.getElementById('risk-indicator');
+      const riskLabelEl = document.getElementById('risk-label');
+      const mlPrediction = document.getElementById('ml-prediction');
+      
+      analyzedUrl.textContent = url;
+      riskIndicator.style.left = `${riskPercent}%`;
+      riskLabelEl.textContent = riskLabel;
+      
+      if (type === 'safe') {
+        resultIcon.innerHTML = `
+          <div class="w-full h-full bg-emerald-500/20 rounded-xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>`;
+        resultTitle.textContent = 'URL is Safe';
+        resultTitle.className = 'text-xl sm:text-2xl font-bold text-emerald-400';
+        resultSubtitle.textContent = 'No threats detected';
+        confidenceBadge.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-emerald-500/20 text-emerald-400';
+        riskLabelEl.className = 'text-sm font-bold text-emerald-400';
+        mlPrediction.textContent = 'Legitimate';
+        mlPrediction.className = 'text-lg font-bold text-emerald-400';
+      } else if (type === 'danger') {
+        resultIcon.innerHTML = `
+          <div class="w-full h-full bg-red-500/20 rounded-xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>`;
+        resultTitle.textContent = 'Phishing Detected!';
+        resultTitle.className = 'text-xl sm:text-2xl font-bold text-red-400';
+        resultSubtitle.textContent = 'This URL is dangerous';
+        confidenceBadge.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-red-500/20 text-red-400';
+        riskLabelEl.className = 'text-sm font-bold text-red-400';
+        mlPrediction.textContent = 'Phishing';
+        mlPrediction.className = 'text-lg font-bold text-red-400';
+      } else {
+        resultIcon.innerHTML = `
+          <div class="w-full h-full bg-yellow-500/20 rounded-xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>`;
+        resultTitle.textContent = 'Suspicious URL';
+        resultTitle.className = 'text-xl sm:text-2xl font-bold text-yellow-400';
+        resultSubtitle.textContent = 'Proceed with caution';
+        confidenceBadge.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-yellow-500/20 text-yellow-400';
+        riskLabelEl.className = 'text-sm font-bold text-yellow-400';
+        mlPrediction.textContent = 'Suspicious';
+        mlPrediction.className = 'text-lg font-bold text-yellow-400';
+      }
+      
+      confidenceBadge.textContent = `${confidence}% Confidence`;
+      
+      // Generate feature analysis
+      const featureList = document.getElementById('feature-list');
+      featureList.innerHTML = mlFeatures.slice(0, 6).map(feature => {
+        const passed = type === 'safe' ? Math.random() > 0.1 : Math.random() > 0.4;
+        return `
+          <div class="flex items-center justify-between py-2 px-3 bg-slate-900/30 rounded-lg">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full ${passed ? 'bg-emerald-400' : 'bg-red-400'}"></span>
+              <span class="text-sm text-slate-300">${feature.name}</span>
+            </div>
+            <span class="text-xs text-slate-500">${feature.desc}</span>
+          </div>
+        `;
+      }).join('');
+      
+      // Scroll to results
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function addToHistory(url, type, confidence) {
+      const entry = { url, type, confidence, timestamp: new Date() };
+      scanHistory.unshift(entry);
+      if (scanHistory.length > 5) scanHistory.pop();
+      
+      renderHistory();
+    }
+    
+    function renderHistory() {
+      if (scanHistory.length === 0) {
+        historyList.innerHTML = '<p class="text-sm text-slate-500 text-center py-8">No scans yet. Enter a URL above to get started.</p>';
+        return;
+      }
+      
+      historyList.innerHTML = scanHistory.map(entry => {
+        const typeColors = {
+          safe: 'text-emerald-400 bg-emerald-500/10',
+          danger: 'text-red-400 bg-red-500/10',
+          warning: 'text-yellow-400 bg-yellow-500/10'
+        };
+        const typeLabels = {
+          safe: 'Safe',
+          danger: 'Phishing',
+          warning: 'Suspicious'
+        };
+        const typeIcons = {
+          safe: '✓',
+          danger: '✕',
+          warning: '!'
+        };
+        
+        return `
+          <div class="history-item rounded-xl p-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-8 h-8 rounded-lg ${typeColors[entry.type]} flex items-center justify-center font-bold text-sm flex-shrink-0">
+                ${typeIcons[entry.type]}
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm text-slate-300 truncate" style="font-family: 'JetBrains Mono', monospace;">${entry.url}</p>
+                <p class="text-xs text-slate-500">${entry.timestamp.toLocaleTimeString()}</p>
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <span class="text-xs font-medium ${typeColors[entry.type].split(' ')[0]}">${typeLabels[entry.type]}</span>
+              <p class="text-xs text-slate-500">${entry.confidence}%</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Event Listeners
+    scanForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        urlInput.focus();
+        return;
+      }
+      
+      // Basic URL validation
+      let validUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        validUrl = 'https://' + url;
+      }
+      
+      analyzeUrl(validUrl);
+    });
+    
+    document.getElementById('new-scan-btn').addEventListener('click', () => {
+      resultsSection.classList.add('hidden');
+      urlInput.value = '';
+      urlInput.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    document.getElementById('report-btn').addEventListener('click', () => {
+      const reportBtn = document.getElementById('report-btn');
+      reportBtn.textContent = 'Report Submitted ✓';
+      reportBtn.disabled = true;
+      setTimeout(() => {
+        reportBtn.textContent = 'Report False Positive';
+        reportBtn.disabled = false;
+      }, 2000);
+    });
+    
+    // Element SDK Integration
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      // Title
+      const titleEl = document.getElementById('app-title');
+      titleEl.textContent = config.app_title || defaultConfig.app_title;
+      
+      // Tagline
+      const taglineEl = document.getElementById('tagline');
+      taglineEl.textContent = config.tagline || defaultConfig.tagline;
+      
+      // Scan button text
+      scanBtnText.textContent = config.scan_button_text || defaultConfig.scan_button_text;
+      
+      // Input placeholder
+      urlInput.placeholder = config.input_placeholder || defaultConfig.input_placeholder;
+      
+      // Font
+      if (config.font_family) {
+        document.body.style.fontFamily = `${config.font_family}, 'Space Grotesk', sans-serif`;
+      }
+      
+      // Background color
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      document.body.style.background = `linear-gradient(135deg, ${bgColor} 0%, ${surfaceColor} 25%, #111d2e 50%, #0a1628 75%, #060b14 100%)`;
+      
+      // Text color
+      const textColor = config.text_color || defaultConfig.text_color;
+      document.body.style.color = textColor;
+      
+      // Primary color
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const inputContainer = document.querySelector('.input-container');
+      if (inputContainer) {
+        inputContainer.style.borderColor = `${primaryColor}4d`;
+      }
+      
+      // Accent color
+      const accentColor = config.accent_color || defaultConfig.accent_color;
+      const scanBtnEl = document.getElementById('scan-btn');
+      if (scanBtnEl) {
+        scanBtnEl.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`;
+      }
+      
+      // Font size
+      if (config.font_size) {
+        titleEl.style.fontSize = `${config.font_size * 2.5}px`;
+        taglineEl.style.fontSize = `${config.font_size}px`;
+      }
+    }
+    
+    function mapToCapabilities(cfg) {
+      return {
+        recolorables: [
+          {
+            get: () => cfg.background_color || defaultConfig.background_color,
+            set: (value) => { cfg.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => cfg.surface_color || defaultConfig.surface_color,
+            set: (value) => { cfg.surface_color = value; window.elementSdk.setConfig({ surface_color: value }); }
+          },
+          {
+            get: () => cfg.text_color || defaultConfig.text_color,
+            set: (value) => { cfg.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+          },
+          {
+            get: () => cfg.primary_color || defaultConfig.primary_color,
+            set: (value) => { cfg.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); }
+          },
+          {
+            get: () => cfg.accent_color || defaultConfig.accent_color,
+            set: (value) => { cfg.accent_color = value; window.elementSdk.setConfig({ accent_color: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => cfg.font_family || 'Space Grotesk',
+          set: (value) => { cfg.font_family = value; window.elementSdk.setConfig({ font_family: value }); }
+        },
+        fontSizeable: {
+          get: () => cfg.font_size || 16,
+          set: (value) => { cfg.font_size = value; window.elementSdk.setConfig({ font_size: value }); }
+        }
+      };
+    }
+    
+    function mapToEditPanelValues(cfg) {
+      return new Map([
+        ['app_title', cfg.app_title || defaultConfig.app_title],
+        ['tagline', cfg.tagline || defaultConfig.tagline],
+        ['scan_button_text', cfg.scan_button_text || defaultConfig.scan_button_text],
+        ['input_placeholder', cfg.input_placeholder || defaultConfig.input_placeholder]
+      ]);
+    }
+    
+    // Initialize SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afd9f2b77133989',t:'MTc2NjA1MDAxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

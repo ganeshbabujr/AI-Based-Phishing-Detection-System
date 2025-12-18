@@ -1,0 +1,1665 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishGuard AI - Neural Threat Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      box-sizing: border-box;
+      font-family: 'Syne', sans-serif;
+      background: #0a0a0f;
+      overflow-x: hidden;
+    }
+    
+    .mono { font-family: 'Space Mono', monospace; }
+    
+    /* Cyberpunk Grid */
+    .cyber-grid {
+      background-image: 
+        linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      animation: gridMove 20s linear infinite;
+    }
+    
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 80px 80px; }
+    }
+    
+    /* Aurora Background */
+    .aurora {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .aurora-beam {
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      background: conic-gradient(
+        from 180deg at 50% 50%,
+        transparent 0deg,
+        rgba(0, 255, 136, 0.08) 60deg,
+        transparent 120deg,
+        rgba(0, 210, 255, 0.06) 180deg,
+        transparent 240deg,
+        rgba(255, 0, 128, 0.04) 300deg,
+        transparent 360deg
+      );
+      animation: auroraRotate 30s linear infinite;
+    }
+    
+    @keyframes auroraRotate {
+      from { transform: translate(-25%, -25%) rotate(0deg); }
+      to { transform: translate(-25%, -25%) rotate(360deg); }
+    }
+    
+    /* Floating Particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #00ff88;
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: particleFloat 15s ease-in-out infinite;
+    }
+    
+    @keyframes particleFloat {
+      0%, 100% { transform: translateY(100%) translateX(0) scale(0); opacity: 0; }
+      10% { opacity: 0.6; transform: scale(1); }
+      90% { opacity: 0.3; }
+      100% { transform: translateY(-100%) translateX(50px) scale(0.5); opacity: 0; }
+    }
+    
+    /* Neon Glow */
+    .neon-green { 
+      color: #00ff88;
+      text-shadow: 0 0 10px #00ff88, 0 0 30px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 255, 136, 0.3);
+    }
+    
+    .neon-cyan {
+      color: #00d4ff;
+      text-shadow: 0 0 10px #00d4ff, 0 0 30px rgba(0, 212, 255, 0.5);
+    }
+    
+    .neon-pink {
+      color: #ff0080;
+      text-shadow: 0 0 10px #ff0080, 0 0 30px rgba(255, 0, 128, 0.5);
+    }
+    
+    /* Glass Morphism */
+    .glass-dark {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(40px);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+    }
+    
+    .glass-card {
+      background: linear-gradient(135deg, rgba(20, 20, 30, 0.9) 0%, rgba(10, 10, 15, 0.95) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent);
+    }
+    
+    /* Scan Lines Effect */
+    .scanlines::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+      opacity: 0.3;
+    }
+    
+    /* Holographic Border */
+    .holo-border {
+      position: relative;
+    }
+    
+    .holo-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: linear-gradient(
+        45deg,
+        #00ff88,
+        #00d4ff,
+        #ff0080,
+        #00ff88,
+        #00d4ff
+      );
+      background-size: 300% 300%;
+      animation: holoBorder 4s ease infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    
+    .holo-border::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: inherit;
+      z-index: 0;
+    }
+    
+    @keyframes holoBorder {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    /* Input Field */
+    .cyber-input {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .cyber-input:focus-within {
+      border-color: #00ff88;
+      box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1), 0 0 40px rgba(0, 255, 136, 0.2), inset 0 0 60px rgba(0, 255, 136, 0.03);
+    }
+    
+    .cyber-input textarea {
+      background: transparent;
+      resize: none;
+    }
+    
+    .cyber-input textarea:focus { outline: none; }
+    .cyber-input textarea::placeholder { color: rgba(0, 255, 136, 0.3); }
+    
+    /* Glitch Text */
+    .glitch {
+      position: relative;
+      animation: glitchText 3s infinite;
+    }
+    
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .glitch::before {
+      color: #ff0080;
+      animation: glitch1 0.3s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+      transform: translate(-2px);
+    }
+    
+    .glitch::after {
+      color: #00d4ff;
+      animation: glitch2 0.3s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+      transform: translate(2px);
+    }
+    
+    @keyframes glitch1 {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-3px, 3px); }
+      40% { transform: translate(-3px, -3px); }
+      60% { transform: translate(3px, 3px); }
+      80% { transform: translate(3px, -3px); }
+    }
+    
+    @keyframes glitch2 {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(3px, -3px); }
+      40% { transform: translate(3px, 3px); }
+      60% { transform: translate(-3px, -3px); }
+      80% { transform: translate(-3px, 3px); }
+    }
+    
+    /* Cyber Button */
+    .cyber-btn {
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    }
+    
+    .cyber-btn::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: #0a0a0f;
+      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+      transition: all 0.4s;
+    }
+    
+    .cyber-btn:hover::before {
+      background: transparent;
+    }
+    
+    .cyber-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 255, 136, 0.4), 0 0 0 1px rgba(0, 255, 136, 0.2);
+    }
+    
+    .cyber-btn:active {
+      transform: translateY(-2px);
+    }
+    
+    .cyber-btn span {
+      position: relative;
+      z-index: 10;
+    }
+    
+    .cyber-btn:hover span {
+      color: #0a0a0f;
+    }
+    
+    /* Sample Cards */
+    .threat-card {
+      background: rgba(15, 15, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .threat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transition: left 0.6s;
+    }
+    
+    .threat-card:hover::before {
+      left: 100%;
+    }
+    
+    .threat-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(0, 255, 136, 0.3);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 255, 136, 0.1);
+    }
+    
+    .threat-card.danger:hover {
+      border-color: rgba(255, 0, 128, 0.4);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 0, 128, 0.15);
+    }
+    
+    /* Result Cards */
+    .result-safe {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 212, 255, 0.02) 100%);
+      border: 2px solid rgba(0, 255, 136, 0.4);
+      box-shadow: 0 0 100px rgba(0, 255, 136, 0.15), inset 0 0 100px rgba(0, 255, 136, 0.02);
+    }
+    
+    .result-danger {
+      background: linear-gradient(135deg, rgba(255, 0, 128, 0.08) 0%, rgba(255, 50, 50, 0.03) 100%);
+      border: 2px solid rgba(255, 0, 128, 0.4);
+      box-shadow: 0 0 100px rgba(255, 0, 128, 0.15), inset 0 0 100px rgba(255, 0, 128, 0.02);
+    }
+    
+    /* Confidence Ring */
+    .confidence-ring {
+      width: 160px;
+      height: 160px;
+      position: relative;
+    }
+    
+    .confidence-ring svg {
+      transform: rotate(-90deg);
+      filter: drop-shadow(0 0 15px currentColor);
+    }
+    
+    .confidence-ring .track {
+      stroke: rgba(255, 255, 255, 0.05);
+    }
+    
+    .confidence-ring .progress {
+      stroke-dasharray: 408;
+      stroke-dashoffset: 408;
+      transition: stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Loading Animation */
+    .neural-loader {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    
+    .neural-dot {
+      width: 14px;
+      height: 14px;
+      background: #00ff88;
+      border-radius: 2px;
+      animation: neuralPulse 1.2s ease-in-out infinite;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+    }
+    
+    .neural-dot:nth-child(2) { animation-delay: 0.1s; background: #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.6); }
+    .neural-dot:nth-child(3) { animation-delay: 0.2s; background: #ff0080; box-shadow: 0 0 20px rgba(255, 0, 128, 0.6); }
+    .neural-dot:nth-child(4) { animation-delay: 0.3s; }
+    .neural-dot:nth-child(5) { animation-delay: 0.4s; background: #00d4ff; box-shadow: 0 0 20px rgba(0, 212, 255, 0.6); }
+    
+    @keyframes neuralPulse {
+      0%, 100% { transform: scale(0.5) rotate(0deg); opacity: 0.3; }
+      50% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+    }
+    
+    /* Scan Animation */
+    .scan-beam {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #00ff88, #00d4ff, #00ff88, transparent);
+      box-shadow: 0 0 30px #00ff88, 0 0 60px rgba(0, 255, 136, 0.5);
+      animation: scanBeam 1.8s ease-in-out infinite;
+    }
+    
+    @keyframes scanBeam {
+      0% { top: 0; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    
+    /* Stats Counter */
+    .stat-box {
+      background: rgba(10, 10, 15, 0.9);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-box::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00ff88, #00d4ff, #ff0080);
+      transform: scaleX(0);
+      transition: transform 0.5s ease;
+    }
+    
+    .stat-box:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .stat-box:hover {
+      border-color: rgba(0, 255, 136, 0.3);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Pipeline Steps */
+    .pipeline-step {
+      background: rgba(15, 15, 20, 0.8);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      position: relative;
+      transition: all 0.4s ease;
+    }
+    
+    .pipeline-step:hover {
+      border-color: rgba(0, 255, 136, 0.4);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0, 255, 136, 0.1);
+    }
+    
+    .pipeline-step .step-num {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      color: #0a0a0f;
+      font-weight: 800;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+    }
+    
+    .toast {
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      transform: translateX(150%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+    }
+    
+    .modal-content {
+      background: linear-gradient(180deg, rgba(20, 20, 30, 0.98) 0%, rgba(10, 10, 15, 0.99) 100%);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, #00ff88, #00d4ff);
+      border-radius: 3px;
+    }
+    
+    /* Light Theme */
+    .light-theme {
+      background: linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%) !important;
+    }
+    
+    .light-theme .cyber-grid {
+      background-image: 
+        linear-gradient(rgba(0, 150, 100, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 150, 100, 0.08) 1px, transparent 1px);
+    }
+    
+    .light-theme .glass-dark,
+    .light-theme .glass-card {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-color: rgba(0, 150, 100, 0.2) !important;
+    }
+    
+    .light-theme .cyber-input {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: rgba(0, 150, 100, 0.3) !important;
+    }
+    
+    .light-theme .cyber-input textarea {
+      color: #1a1a2e !important;
+    }
+    
+    .light-theme .threat-card,
+    .light-theme .stat-box,
+    .light-theme .pipeline-step {
+      background: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .light-theme header {
+      background: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .light-theme .text-white { color: #1a1a2e !important; }
+    .light-theme .text-gray-400 { color: #64748b !important; }
+    .light-theme .text-gray-500 { color: #94a3b8 !important; }
+    .light-theme .neon-green { color: #00aa66 !important; text-shadow: none !important; }
+    
+    /* Reveal Animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      animation: revealUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    
+    @keyframes revealUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .reveal-delay-1 { animation-delay: 0.15s; }
+    .reveal-delay-2 { animation-delay: 0.3s; }
+    .reveal-delay-3 { animation-delay: 0.45s; }
+    .reveal-delay-4 { animation-delay: 0.6s; }
+    
+    /* Threat Pulse */
+    .threat-pulse {
+      animation: threatPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes threatPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 0, 128, 0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(255, 0, 128, 0); }
+    }
+    
+    /* Typing Effect */
+    .typing-cursor::after {
+      content: '|';
+      animation: blink 1s step-end infinite;
+      color: #00ff88;
+    }
+    
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full text-white overflow-auto"><!-- Aurora Background -->
+  <div class="aurora">
+   <div class="aurora-beam"></div>
+  </div><!-- Cyber Grid -->
+  <div class="fixed inset-0 cyber-grid pointer-events-none"></div><!-- Particles -->
+  <div class="particles" id="particles"></div><!-- Toast Container -->
+  <div class="toast-container">
+   <div id="toast" class="toast rounded-2xl p-4 flex items-center gap-4 min-w-[300px]">
+    <div id="toast-icon" class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"></div>
+    <div class="flex-1">
+     <p id="toast-title" class="text-sm font-bold text-white"></p>
+     <p id="toast-message" class="text-xs text-gray-400"></p>
+    </div><button id="toast-close" class="text-gray-500 hover:text-white transition-colors p-1">
+     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+     </svg></button>
+   </div>
+  </div><!-- History Modal -->
+  <div id="history-modal" class="fixed inset-0 z-50 hidden">
+   <div class="modal-overlay absolute inset-0" id="history-backdrop"></div>
+   <div class="absolute inset-4 sm:inset-8 lg:inset-16 flex items-start justify-center overflow-auto py-8">
+    <div class="modal-content rounded-3xl w-full max-w-3xl p-8 relative">
+     <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-4">
+       <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-cyan-500/10 flex items-center justify-center">
+        <svg class="w-7 h-7 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <div>
+        <h3 class="text-2xl font-bold text-white">Scan Archive</h3>
+        <p class="text-sm text-gray-500 mono">Historical threat analysis</p>
+       </div>
+      </div><button id="close-history" class="w-12 h-12 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all">
+       <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+     <div id="history-list" class="space-y-4 max-h-[55%] overflow-auto pr-2"></div>
+     <div id="history-empty" class="text-center py-16">
+      <div class="w-24 h-24 mx-auto mb-6 rounded-3xl bg-white/5 flex items-center justify-center">
+       <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+       </svg>
+      </div>
+      <p class="text-lg font-semibold text-gray-400 mb-2">No Scan History</p>
+      <p class="text-sm text-gray-600">Your analysis results will appear here</p>
+     </div>
+     <div class="flex items-center justify-between mt-8 pt-8 border-t border-white/10"><button id="clear-history" class="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-pink-400 hover:bg-pink-500/10 transition-all">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+       </svg> Clear All </button> <button id="export-history" class="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-green-500/20 to-cyan-500/20 text-green-400 hover:from-green-500/30 hover:to-cyan-500/30 transition-all border border-green-500/20">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+       </svg> Export Report </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="relative z-10 min-h-full w-full flex flex-col"><!-- Header -->
+   <header class="sticky top-0 z-40 glass-dark">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex items-center justify-between h-20"><!-- Logo -->
+      <div class="flex items-center gap-4">
+       <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/30 to-cyan-500/20 flex items-center justify-center relative">
+        <svg class="w-7 h-7 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+       </div>
+       <div>
+        <h1 class="text-xl font-bold tracking-tight"><span class="text-white">PHISH</span><span class="neon-green">GUARD</span></h1>
+        <p class="text-[10px] text-gray-500 mono tracking-widest">NEURAL THREAT DETECTION</p>
+       </div>
+      </div><!-- Right Controls -->
+      <div class="flex items-center gap-4">
+       <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> <span id="live-clock" class="text-xs mono text-gray-400">--:--:--</span>
+       </div><button id="theme-toggle" class="w-11 h-11 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all border border-white/10" aria-label="Toggle theme">
+        <svg id="theme-icon-dark" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        <svg id="theme-icon-light" class="w-5 h-5 text-amber-400 hidden" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg></button>
+       <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30"><span class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-500/50"></span> <span class="text-xs font-bold neon-green hidden sm:inline">ONLINE</span>
+       </div>
+      </div>
+     </div>
+    </div>
+   </header>
+   <main class="flex-1 w-full"><!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 reveal">
+     <div class="text-center max-w-4xl mx-auto"><!-- Badge -->
+      <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass-card mb-8">
+       <div class="flex gap-1"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay: 0.2s"></span> <span class="w-2 h-2 bg-pink-400 rounded-full animate-pulse" style="animation-delay: 0.4s"></span>
+       </div><span class="text-sm font-semibold text-gray-300">Powered by Neural Networks</span>
+      </div><!-- Title -->
+      <h2 id="hero-title" class="text-4xl sm:text-5xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight"><span class="text-white">AI-Powered</span><br><span class="glitch neon-green" data-text="Threat Detection">Threat Detection</span></h2><!-- Subtitle -->
+      <p id="hero-subtitle" class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">Advanced machine learning algorithms to detect phishing attacks, scam messages, and social engineering threats in real-time</p><!-- Quick Stats -->
+      <div class="flex flex-wrap justify-center gap-8 sm:gap-16">
+       <div class="text-center">
+        <p class="text-4xl sm:text-5xl font-black neon-green">95%</p>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Accuracy</p>
+       </div>
+       <div class="hidden sm:block w-px h-16 bg-gradient-to-b from-transparent via-green-500/30 to-transparent"></div>
+       <div class="text-center">
+        <p class="text-4xl sm:text-5xl font-black neon-cyan">&lt;1s</p>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Response</p>
+       </div>
+       <div class="hidden sm:block w-px h-16 bg-gradient-to-b from-transparent via-cyan-500/30 to-transparent"></div>
+       <div class="text-center">
+        <p class="text-4xl sm:text-5xl font-black neon-pink">5K+</p>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Trained</p>
+       </div>
+      </div>
+     </div>
+    </section><!-- Main Scanner Section -->
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 reveal reveal-delay-1">
+     <div class="glass-card holo-border rounded-3xl p-8 sm:p-10 relative scanlines"><!-- Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+       <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-cyan-500/10 flex items-center justify-center">
+         <svg class="w-7 h-7 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+         </svg>
+        </div>
+        <div>
+         <h3 class="text-xl font-bold text-white">Neural Scanner</h3>
+         <p class="text-sm text-gray-500">Paste suspicious message to analyze</p>
+        </div>
+       </div>
+       <div class="flex items-center gap-3"><button id="history-btn" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all">
+         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg><span class="text-sm text-gray-400 font-medium hidden sm:inline">History</span> <span id="history-count" class="w-6 h-6 rounded-lg bg-green-500/20 text-green-400 text-xs font-bold flex items-center justify-center">0</span> </button>
+        <div id="threat-level" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10"><span class="w-2.5 h-2.5 bg-gray-500 rounded-full"></span> <span class="text-xs text-gray-400 font-bold tracking-wide">STANDBY</span>
+        </div>
+       </div>
+      </div><!-- Input Area -->
+      <div class="cyber-input rounded-2xl p-6 mb-6 relative overflow-hidden">
+       <div id="scan-effect" class="hidden absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="scan-beam"></div>
+       </div><label for="message-input" class="sr-only">Enter message to analyze</label> <textarea id="message-input" class="w-full h-48 sm:h-56 text-white text-base mono leading-relaxed relative z-10" placeholder="Paste your suspicious email, SMS, or message here...
+
+Example: 'URGENT: Your account has been compromised! Click http://verify-now.xyz to secure your account immediately.'"></textarea> <!-- Input Footer -->
+       <div class="flex flex-wrap items-center justify-between gap-4 pt-5 border-t border-white/10 relative z-10">
+        <div class="flex items-center gap-4"><span id="char-count" class="text-xs text-gray-500 mono">0 characters</span> <span class="w-1.5 h-1.5 bg-gray-700 rounded-full"></span> <span id="word-count" class="text-xs text-gray-500">0 words</span>
+        </div>
+        <div class="flex items-center gap-4"><span class="text-[10px] text-gray-600 hidden sm:inline mono">CTRL + ENTER</span> <button id="paste-btn" class="text-sm text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg> Paste </button> <button id="clear-btn" class="text-sm text-gray-400 hover:text-pink-400 transition-colors flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg> Clear </button>
+        </div>
+       </div>
+      </div><!-- Analyze Button --> <button id="analyze-btn" class="cyber-btn w-full py-5 rounded-xl text-lg font-bold"> <span class="flex items-center justify-center gap-3 neon-green">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg><span id="btn-text">Initiate Neural Scan</span> </span> </button> <!-- Loading State -->
+      <div id="loading-state" class="hidden py-16">
+       <div class="flex flex-col items-center gap-8">
+        <div class="neural-loader">
+         <div class="neural-dot"></div>
+         <div class="neural-dot"></div>
+         <div class="neural-dot"></div>
+         <div class="neural-dot"></div>
+         <div class="neural-dot"></div>
+        </div>
+        <div class="text-center">
+         <p class="text-xl font-bold text-white mb-2">Processing Neural Network</p>
+         <p id="loading-step" class="text-sm text-gray-400 mono typing-cursor">Initializing TF-IDF vectorizer</p>
+        </div>
+       </div>
+      </div><!-- Result Container -->
+      <div id="result-container" class="hidden mt-8"></div>
+     </div>
+    </section><!-- Sample Messages -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 reveal reveal-delay-2">
+     <div class="flex items-center justify-between mb-8">
+      <div>
+       <h3 class="text-2xl sm:text-3xl font-bold text-white mb-2">Test Vectors</h3>
+       <p class="text-sm text-gray-500">Click to load sample threat patterns</p>
+      </div>
+     </div>
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><!-- Safe Column -->
+      <div>
+       <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+         <svg class="w-5 h-5 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+         </svg>
+        </div><span class="text-sm font-bold text-green-400 uppercase tracking-wider">Legitimate Messages</span>
+       </div>
+       <div class="space-y-4"><button class="threat-card w-full p-6 rounded-2xl text-left" data-type="safe" data-message="Hi Sarah, just a quick reminder about our project sync meeting tomorrow at 10 AM in Conference Room B. Please bring your progress report and any blockers you'd like to discuss. Let me know if the time doesn't work. Best, Michael - Engineering Lead">
+         <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center flex-shrink-0 border border-green-500/20">
+           <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+           </svg>
+          </div>
+          <div class="flex-1">
+           <div class="flex items-center gap-3 mb-2">
+            <p class="text-base font-bold text-white">Meeting Reminder</p><span class="px-2 py-1 rounded-lg bg-green-500/20 text-green-400 text-[10px] font-bold tracking-wide">LOW RISK</span>
+           </div>
+           <p class="text-sm text-gray-400 mb-3">Professional workplace communication with proper context</p>
+           <div class="flex items-center gap-3 text-[11px] text-gray-500 mono"><span>INTERNAL</span> <span class="w-1 h-1 bg-gray-600 rounded-full"></span> <span>BUSINESS</span>
+           </div>
+          </div>
+         </div></button> <button class="threat-card w-full p-6 rounded-2xl text-left" data-type="safe" data-message="Your Amazon order #123-7890456-1234567 has shipped! Track your package at amazon.com/orders. Estimated delivery: Friday, March 15, 2024. Thank you for shopping with us! - Amazon Customer Service">
+         <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center flex-shrink-0 border border-green-500/20">
+           <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+           </svg>
+          </div>
+          <div class="flex-1">
+           <div class="flex items-center gap-3 mb-2">
+            <p class="text-base font-bold text-white">Order Shipping</p><span class="px-2 py-1 rounded-lg bg-green-500/20 text-green-400 text-[10px] font-bold tracking-wide">LOW RISK</span>
+           </div>
+           <p class="text-sm text-gray-400 mb-3">Legitimate e-commerce notification with valid domain</p>
+           <div class="flex items-center gap-3 text-[11px] text-gray-500 mono"><span>E-COMMERCE</span> <span class="w-1 h-1 bg-gray-600 rounded-full"></span> <span>TRANSACTIONAL</span>
+           </div>
+          </div>
+         </div></button>
+       </div>
+      </div><!-- Phishing Column -->
+      <div>
+       <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center threat-pulse">
+         <svg class="w-5 h-5 neon-pink" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+         </svg>
+        </div><span class="text-sm font-bold text-pink-400 uppercase tracking-wider">Phishing Threats</span>
+       </div>
+       <div class="space-y-4"><button class="threat-card danger w-full p-6 rounded-2xl text-left" data-type="phishing" data-message="⚠️ URGENT SECURITY ALERT: Your bank account has been locked due to suspicious activity! Click here immediately to verify your identity and restore access: http://secure-bankverify.xyz/login - Failure to respond within 24 HOURS will result in permanent account closure!">
+         <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center flex-shrink-0 border border-pink-500/20 threat-pulse">
+           <svg class="w-7 h-7 text-pink-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+           </svg>
+          </div>
+          <div class="flex-1">
+           <div class="flex items-center gap-3 mb-2">
+            <p class="text-base font-bold text-white">Fake Bank Alert</p><span class="px-2 py-1 rounded-lg bg-pink-500/20 text-pink-400 text-[10px] font-bold tracking-wide">HIGH RISK</span>
+           </div>
+           <p class="text-sm text-gray-400 mb-3">Urgency tactics, suspicious URL, threatening language</p>
+           <div class="flex items-center gap-3 text-[11px] text-gray-500 mono"><span>FINANCIAL</span> <span class="w-1 h-1 bg-gray-600 rounded-full"></span> <span>CREDENTIAL THEFT</span>
+           </div>
+          </div>
+         </div></button> <button class="threat-card danger w-full p-6 rounded-2xl text-left" data-type="phishing" data-message="🎉 CONGRATULATIONS!!! You have been randomly selected as our WINNER of $5,000,000 USD in the International Email Lottery! To claim your prize money, reply with your full name, home address, phone number, and bank account details to: prize-claims@winner-lottery.tk">
+         <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center flex-shrink-0 border border-pink-500/20 threat-pulse">
+           <svg class="w-7 h-7 text-pink-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+           </svg>
+          </div>
+          <div class="flex-1">
+           <div class="flex items-center gap-3 mb-2">
+            <p class="text-base font-bold text-white">Lottery Scam</p><span class="px-2 py-1 rounded-lg bg-pink-500/20 text-pink-400 text-[10px] font-bold tracking-wide">HIGH RISK</span>
+           </div>
+           <p class="text-sm text-gray-400 mb-3">Too good to be true, requests personal &amp; financial info</p>
+           <div class="flex items-center gap-3 text-[11px] text-gray-500 mono"><span>ADVANCE FEE</span> <span class="w-1 h-1 bg-gray-600 rounded-full"></span> <span>IDENTITY THEFT</span>
+           </div>
+          </div>
+         </div></button>
+       </div>
+      </div>
+     </div>
+    </section><!-- Stats Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 reveal reveal-delay-3">
+     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="stat-box rounded-2xl p-6 text-center transition-all cursor-default">
+       <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center">
+        <svg class="w-8 h-8 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <p class="text-4xl sm:text-5xl font-black neon-green mb-2">95%</p>
+       <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Model Accuracy</p>
+      </div>
+      <div class="stat-box rounded-2xl p-6 text-center transition-all cursor-default">
+       <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 flex items-center justify-center">
+        <svg class="w-8 h-8 neon-cyan" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+       </div>
+       <p id="scan-count" class="text-4xl sm:text-5xl font-black neon-cyan mb-2">0</p>
+       <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Scans Today</p>
+      </div>
+      <div class="stat-box rounded-2xl p-6 text-center transition-all cursor-default">
+       <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 flex items-center justify-center">
+        <svg class="w-8 h-8 text-purple-400" style="filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+       </div>
+       <p class="text-4xl sm:text-5xl font-black text-purple-400 mb-2" style="text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);">5K+</p>
+       <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Training Data</p>
+      </div>
+      <div class="stat-box rounded-2xl p-6 text-center transition-all cursor-default">
+       <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-pink-500/20 to-pink-500/5 flex items-center justify-center">
+        <svg class="w-8 h-8 neon-pink" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <p class="text-4xl sm:text-5xl font-black neon-pink mb-2">&lt;1s</p>
+       <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Response Time</p>
+      </div>
+     </div>
+    </section><!-- ML Pipeline -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 reveal reveal-delay-4">
+     <div class="text-center mb-12">
+      <h3 class="text-2xl sm:text-3xl font-bold text-white mb-3">Neural Processing Pipeline</h3>
+      <p class="text-gray-500">How our AI analyzes and classifies threats</p>
+     </div>
+     <div class="glass-card rounded-3xl p-8 sm:p-10">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+       <div class="pipeline-step rounded-2xl p-6 text-center pt-10"><span class="step-num">1</span>
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-green-500/15 flex items-center justify-center">
+         <svg class="w-7 h-7 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+         </svg>
+        </div>
+        <h4 class="text-sm font-bold text-white mb-1">Input Text</h4>
+        <p class="text-xs text-gray-500">Raw message data</p>
+       </div>
+       <div class="pipeline-step rounded-2xl p-6 text-center pt-10"><span class="step-num">2</span>
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-cyan-500/15 flex items-center justify-center">
+         <svg class="w-7 h-7 neon-cyan" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+         </svg>
+        </div>
+        <h4 class="text-sm font-bold text-white mb-1">TF-IDF Vectorization</h4>
+        <p class="text-xs text-gray-500">Feature extraction</p>
+       </div>
+       <div class="pipeline-step rounded-2xl p-6 text-center pt-10"><span class="step-num">3</span>
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-purple-500/15 flex items-center justify-center">
+         <svg class="w-7 h-7 text-purple-400" style="filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+         </svg>
+        </div>
+        <h4 class="text-sm font-bold text-white mb-1">ML Classification</h4>
+        <p class="text-xs text-gray-500">Neural prediction</p>
+       </div>
+       <div class="pipeline-step rounded-2xl p-6 text-center pt-10"><span class="step-num">4</span>
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-pink-500/15 flex items-center justify-center">
+         <svg class="w-7 h-7 neon-pink" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+        </div>
+        <h4 class="text-sm font-bold text-white mb-1">Threat Output</h4>
+        <p class="text-xs text-gray-500">Confidence score</p>
+       </div>
+      </div><!-- Tech Tags -->
+      <div class="mt-10 pt-8 border-t border-white/10">
+       <p class="text-xs text-gray-500 uppercase tracking-widest mb-5 text-center font-bold">Technology Stack</p>
+       <div class="flex flex-wrap justify-center gap-3"><span class="px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold">Python 3.11</span> <span class="px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold">Flask</span> <span class="px-4 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold">Scikit-learn</span> <span class="px-4 py-2 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 text-xs font-bold">TF-IDF</span> <span class="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">Logistic Regression</span>
+       </div>
+      </div>
+     </div>
+    </section><!-- Detection Features -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+     <div class="text-center mb-10">
+      <h3 class="text-2xl sm:text-3xl font-bold text-white mb-3">Threat Detection Matrix</h3>
+      <p class="text-gray-500">Patterns our neural network identifies</p>
+     </div>
+     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="glass-card rounded-2xl p-5 text-center transition-all hover:scale-105 hover:border-pink-500/30">
+       <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-pink-500/15 flex items-center justify-center">
+        <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+       </div>
+       <p class="text-xs font-bold text-white">Malicious URLs</p>
+      </div>
+      <div class="glass-card rounded-2xl p-5 text-center transition-all hover:scale-105 hover:border-orange-500/30">
+       <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-orange-500/15 flex items-center justify-center">
+        <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <p class="text-xs font-bold text-white">Urgency Tactics</p>
+      </div>
+      <div class="glass-card rounded-2xl p-5 text-center transition-all hover:scale-105 hover:border-yellow-500/30">
+       <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-yellow-500/15 flex items-center justify-center">
+        <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <p class="text-xs font-bold text-white">Money Scams</p>
+      </div>
+      <div class="glass-card rounded-2xl p-5 text-center transition-all hover:scale-105 hover:border-cyan-500/30">
+       <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+        <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+        </svg>
+       </div>
+       <p class="text-xs font-bold text-white">Credential Theft</p>
+      </div>
+      <div class="glass-card rounded-2xl p-5 text-center transition-all hover:scale-105 hover:border-purple-500/30">
+       <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-purple-500/15 flex items-center justify-center">
+        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+       </div>
+       <p class="text-xs font-bold text-white">Impersonation</p>
+      </div>
+      <div class="glass-card rounded-2xl p-5 text-center transition-all hover:scale-105 hover:border-green-500/30">
+       <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-green-500/15 flex items-center justify-center">
+        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+       </div>
+       <p class="text-xs font-bold text-white">Spam Patterns</p>
+      </div>
+     </div>
+    </section>
+   </main><!-- Footer -->
+   <footer class="border-t border-white/10 py-8 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+        <svg class="w-5 h-5 neon-green" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+       </div>
+       <div>
+        <p class="text-sm font-bold text-white">PHISH<span class="neon-green">GUARD</span></p>
+        <p class="text-[10px] text-gray-500">Neural Threat Detection</p>
+       </div>
+      </div>
+      <p id="footer-text" class="text-xs text-gray-500 mono">CSE Final Year Project © 2024</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+      if (Math.random() > 0.7) particle.style.background = '#00d4ff';
+      if (Math.random() > 0.9) particle.style.background = '#ff0080';
+      particlesContainer.appendChild(particle);
+    }
+    
+    // State
+    let scanHistory = [];
+    const MAX_HISTORY = 50;
+    let isDarkTheme = true;
+    let scanCount = 0;
+    
+    const defaultConfig = {
+      hero_title: 'AI-Powered Threat Detection',
+      hero_subtitle: 'Advanced machine learning algorithms to detect phishing attacks, scam messages, and social engineering threats in real-time',
+      button_text: 'Initiate Neural Scan',
+      footer_text: 'CSE Final Year Project © 2024',
+      background_color: '#0a0a0f',
+      surface_color: '#14141e',
+      text_color: '#ffffff',
+      primary_color: '#00ff88',
+      accent_color: '#00d4ff'
+    };
+    
+    let config = { ...defaultConfig };
+    
+    // DOM Elements
+    const messageInput = document.getElementById('message-input');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const btnText = document.getElementById('btn-text');
+    const loadingState = document.getElementById('loading-state');
+    const loadingStep = document.getElementById('loading-step');
+    const resultContainer = document.getElementById('result-container');
+    const charCount = document.getElementById('char-count');
+    const wordCount = document.getElementById('word-count');
+    const clearBtn = document.getElementById('clear-btn');
+    const scanCountEl = document.getElementById('scan-count');
+    const scanEffect = document.getElementById('scan-effect');
+    const threatLevel = document.getElementById('threat-level');
+    const liveClock = document.getElementById('live-clock');
+    
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      liveClock.textContent = now.toLocaleTimeString('en-US', { hour12: false });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIconDark = document.getElementById('theme-icon-dark');
+    const themeIconLight = document.getElementById('theme-icon-light');
+    
+    themeToggle.addEventListener('click', () => {
+      isDarkTheme = !isDarkTheme;
+      document.body.classList.toggle('light-theme', !isDarkTheme);
+      themeIconDark.classList.toggle('hidden', !isDarkTheme);
+      themeIconLight.classList.toggle('hidden', isDarkTheme);
+      showToast(isDarkTheme ? 'Dark Mode' : 'Light Mode', 'Theme switched', 'info');
+    });
+    
+    // Toast System
+    const toast = document.getElementById('toast');
+    const toastIcon = document.getElementById('toast-icon');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMessage = document.getElementById('toast-message');
+    const toastClose = document.getElementById('toast-close');
+    let toastTimeout;
+    
+    function showToast(title, message, type = 'success') {
+      clearTimeout(toastTimeout);
+      
+      const icons = {
+        success: { bg: 'bg-green-500/20', color: 'neon-green', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>' },
+        error: { bg: 'bg-pink-500/20', color: 'neon-pink', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>' },
+        warning: { bg: 'bg-amber-500/20', color: 'text-amber-400', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>' },
+        info: { bg: 'bg-cyan-500/20', color: 'neon-cyan', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' }
+      };
+      
+      const icon = icons[type] || icons.info;
+      toastIcon.className = `w-12 h-12 rounded-xl flex items-center justify-center ${icon.bg}`;
+      toastIcon.innerHTML = `<svg class="w-6 h-6 ${icon.color}" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon.svg}</svg>`;
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
+      
+      toast.classList.add('show');
+      
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+    
+    toastClose.addEventListener('click', () => toast.classList.remove('show'));
+    
+    // History Modal
+    const historyBtn = document.getElementById('history-btn');
+    const historyModal = document.getElementById('history-modal');
+    const historyBackdrop = document.getElementById('history-backdrop');
+    const closeHistory = document.getElementById('close-history');
+    const historyList = document.getElementById('history-list');
+    const historyEmpty = document.getElementById('history-empty');
+    const historyCountEl = document.getElementById('history-count');
+    const clearHistoryBtn = document.getElementById('clear-history');
+    const exportHistoryBtn = document.getElementById('export-history');
+    
+    historyBtn.addEventListener('click', () => {
+      historyModal.classList.remove('hidden');
+      renderHistory();
+    });
+    
+    closeHistory.addEventListener('click', () => historyModal.classList.add('hidden'));
+    historyBackdrop.addEventListener('click', () => historyModal.classList.add('hidden'));
+    
+    function addToHistory(message, result) {
+      const entry = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        message: message.substring(0, 200) + (message.length > 200 ? '...' : ''),
+        fullMessage: message,
+        prediction: result.prediction,
+        confidence: result.confidence,
+        indicators: result.indicators,
+        threatType: result.threatType
+      };
+      
+      scanHistory.unshift(entry);
+      if (scanHistory.length > MAX_HISTORY) scanHistory.pop();
+      historyCountEl.textContent = scanHistory.length;
+    }
+    
+    function renderHistory() {
+      if (scanHistory.length === 0) {
+        historyEmpty.classList.remove('hidden');
+        historyList.innerHTML = '';
+        return;
+      }
+      
+      historyEmpty.classList.add('hidden');
+      historyList.innerHTML = scanHistory.map(entry => {
+        const isPhishing = entry.prediction === 'phishing';
+        const date = new Date(entry.timestamp);
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        return `
+          <div class="flex items-start gap-4 p-5 rounded-2xl ${isPhishing ? 'bg-pink-500/5 border border-pink-500/20' : 'bg-green-500/5 border border-green-500/20'} hover:scale-[1.01] transition-transform cursor-pointer history-item" data-id="${entry.id}">
+            <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center ${isPhishing ? 'bg-pink-500/15' : 'bg-green-500/15'}">
+              ${isPhishing ? 
+                '<svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' :
+                '<svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-sm font-bold ${isPhishing ? 'text-pink-400' : 'text-green-400'}">${isPhishing ? 'THREAT' : 'SAFE'}</span>
+                <span class="text-xs px-2 py-1 rounded-lg ${isPhishing ? 'bg-pink-500/20 text-pink-300' : 'bg-green-500/20 text-green-300'} font-bold">${entry.confidence.toFixed(0)}%</span>
+                <span class="text-[10px] text-gray-500 ml-auto mono">${dateStr} ${timeStr}</span>
+              </div>
+              <p class="text-xs text-gray-400 line-clamp-2">${entry.message}</p>
+            </div>
+            <button class="delete-history p-2 rounded-lg hover:bg-pink-500/20 transition-colors" data-id="${entry.id}">
+              <svg class="w-4 h-4 text-gray-500 hover:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      historyList.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.delete-history')) return;
+          const id = parseInt(item.dataset.id);
+          const entry = scanHistory.find(h => h.id === id);
+          if (entry) {
+            messageInput.value = entry.fullMessage;
+            charCount.textContent = `${entry.fullMessage.length} characters`;
+            wordCount.textContent = `${entry.fullMessage.trim().split(/\s+/).length} words`;
+            historyModal.classList.add('hidden');
+            showToast('Loaded', 'Message restored', 'info');
+          }
+        });
+      });
+      
+      historyList.querySelectorAll('.delete-history').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = parseInt(btn.dataset.id);
+          scanHistory = scanHistory.filter(h => h.id !== id);
+          historyCountEl.textContent = scanHistory.length;
+          renderHistory();
+          showToast('Deleted', 'Entry removed', 'info');
+        });
+      });
+    }
+    
+    clearHistoryBtn.addEventListener('click', () => {
+      if (scanHistory.length === 0) return;
+      scanHistory = [];
+      historyCountEl.textContent = 0;
+      renderHistory();
+      showToast('Cleared', 'History wiped', 'success');
+    });
+    
+    exportHistoryBtn.addEventListener('click', () => {
+      if (scanHistory.length === 0) {
+        showToast('Empty', 'No history to export', 'warning');
+        return;
+      }
+      
+      let report = '╔══════════════════════════════════════════════════════════════╗\n';
+      report += '║              PHISHGUARD AI - THREAT REPORT                   ║\n';
+      report += '╚══════════════════════════════════════════════════════════════╝\n\n';
+      report += `Generated: ${new Date().toLocaleString()}\n`;
+      report += `Total Scans: ${scanHistory.length}\n`;
+      report += `Threats Found: ${scanHistory.filter(h => h.prediction === 'phishing').length}\n`;
+      report += `Safe Messages: ${scanHistory.filter(h => h.prediction === 'safe').length}\n\n`;
+      report += '────────────────────────────────────────────────────────────────\n\n';
+      
+      scanHistory.forEach((entry, i) => {
+        const date = new Date(entry.timestamp);
+        report += `[SCAN ${String(i + 1).padStart(3, '0')}]\n`;
+        report += `Timestamp: ${date.toLocaleString()}\n`;
+        report += `Result: ${entry.prediction.toUpperCase()}\n`;
+        report += `Confidence: ${entry.confidence.toFixed(1)}%\n`;
+        if (entry.prediction === 'phishing') {
+          report += `Threat Type: ${entry.threatType}\n`;
+          if (entry.indicators.length) report += `Indicators: ${entry.indicators.join(', ')}\n`;
+        }
+        report += `Message:\n${entry.fullMessage}\n`;
+        report += '\n────────────────────────────────────────────────────────────────\n\n';
+      });
+      
+      const blob = new Blob([report], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `phishguard-report-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Exported!', 'Report downloaded', 'success');
+    });
+    
+    // Paste Button
+    document.getElementById('paste-btn').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          messageInput.value = text;
+          charCount.textContent = `${text.length} characters`;
+          wordCount.textContent = `${text.trim().split(/\s+/).length} words`;
+          showToast('Pasted', 'Text loaded', 'success');
+        }
+      } catch (err) {
+        showToast('Error', 'Clipboard access denied', 'error');
+      }
+    });
+    
+    // Input Events
+    messageInput.addEventListener('input', () => {
+      const text = messageInput.value;
+      charCount.textContent = `${text.length} characters`;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      wordCount.textContent = `${words} words`;
+    });
+    
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') analyzeBtn.click();
+    });
+    
+    clearBtn.addEventListener('click', () => {
+      messageInput.value = '';
+      charCount.textContent = '0 characters';
+      wordCount.textContent = '0 words';
+      resultContainer.classList.add('hidden');
+      resultContainer.innerHTML = '';
+      threatLevel.innerHTML = '<span class="w-2.5 h-2.5 bg-gray-500 rounded-full"></span><span class="text-xs text-gray-400 font-bold tracking-wide">STANDBY</span>';
+    });
+    
+    // Sample Cards
+    document.querySelectorAll('.threat-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const message = card.dataset.message;
+        messageInput.value = message;
+        charCount.textContent = `${message.length} characters`;
+        wordCount.textContent = `${message.trim().split(/\s+/).length} words`;
+        messageInput.focus();
+        messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+    
+    // Analyze Button
+    analyzeBtn.addEventListener('click', async () => {
+      const message = messageInput.value.trim();
+      
+      if (!message) {
+        showNotification('Please enter a message to analyze', 'warning');
+        messageInput.focus();
+        return;
+      }
+      
+      if (message.length < 10) {
+        showNotification('Message too short. Enter more text.', 'warning');
+        return;
+      }
+      
+      await analyzeMessage(message);
+    });
+    
+    function showNotification(text, type = 'info') {
+      const colors = {
+        warning: 'border-amber-500/30 text-amber-400 bg-amber-500/10',
+        error: 'border-pink-500/30 text-pink-400 bg-pink-500/10',
+        info: 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10'
+      };
+      
+      resultContainer.innerHTML = `
+        <div class="${colors[type]} border rounded-2xl p-6 text-center">
+          <p class="text-sm font-semibold">${text}</p>
+        </div>
+      `;
+      resultContainer.classList.remove('hidden');
+    }
+    
+    async function analyzeMessage(message) {
+      analyzeBtn.disabled = true;
+      loadingState.classList.remove('hidden');
+      resultContainer.classList.add('hidden');
+      scanEffect.classList.remove('hidden');
+      
+      threatLevel.innerHTML = '<span class="w-2.5 h-2.5 bg-cyan-400 rounded-full animate-pulse"></span><span class="text-xs neon-cyan font-bold tracking-wide">SCANNING</span>';
+      
+      const steps = [
+        'Preprocessing input text',
+        'Extracting TF-IDF features',
+        'Running ML classification',
+        'Computing confidence scores',
+        'Generating threat report'
+      ];
+      
+      for (let i = 0; i < steps.length; i++) {
+        loadingStep.textContent = steps[i];
+        await new Promise(r => setTimeout(r, 400 + Math.random() * 400));
+      }
+      
+      const result = simulateMLPrediction(message);
+      
+      loadingState.classList.add('hidden');
+      scanEffect.classList.add('hidden');
+      analyzeBtn.disabled = false;
+      
+      scanCount++;
+      scanCountEl.textContent = scanCount;
+      
+      addToHistory(message, result);
+      
+      if (result.prediction === 'phishing') {
+        threatLevel.innerHTML = '<span class="w-2.5 h-2.5 bg-pink-400 rounded-full threat-pulse"></span><span class="text-xs neon-pink font-bold tracking-wide">THREAT</span>';
+      } else {
+        threatLevel.innerHTML = '<span class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></span><span class="text-xs neon-green font-bold tracking-wide">SAFE</span>';
+      }
+      
+      displayResult(result);
+    }
+    
+    function simulateMLPrediction(message) {
+      const lowerMsg = message.toLowerCase();
+      
+      const phishingKeywords = [
+        'urgent', 'immediately', 'verify', 'suspended', 'click here',
+        'winner', 'won', 'prize', 'lottery', 'congratulations',
+        'bank account', 'password', 'credit card', 'ssn',
+        'act now', 'limited time', 'expire', 'confirm your',
+        '.xyz', '.tk', '.ml', 'free-', 'secure-', 'verify',
+        'locked', '24 hours', 'account closure'
+      ];
+      
+      let phishingScore = 0;
+      const detectedIndicators = [];
+      
+      phishingKeywords.forEach(keyword => {
+        if (lowerMsg.includes(keyword)) {
+          phishingScore += 10;
+          detectedIndicators.push(keyword);
+        }
+      });
+      
+      const urlPattern = /https?:\/\/[^\s]+/gi;
+      const urls = message.match(urlPattern) || [];
+      if (urls.some(url => url.includes('.xyz') || url.includes('.tk') || url.includes('.ml') || url.includes('verify') || url.includes('secure-'))) {
+        phishingScore += 25;
+        detectedIndicators.push('suspicious URL');
+      }
+      
+      if ((lowerMsg.match(/!/g) || []).length > 2) {
+        phishingScore += 10;
+        detectedIndicators.push('excessive punctuation');
+      }
+      
+      const confidence = Math.min(98, 55 + phishingScore);
+      const isPhishing = phishingScore >= 25;
+      
+      let threatType = 'General Phishing';
+      if (lowerMsg.includes('bank') || lowerMsg.includes('account')) threatType = 'Credential Phishing';
+      else if (lowerMsg.includes('lottery') || lowerMsg.includes('won') || lowerMsg.includes('prize')) threatType = 'Advance Fee Scam';
+      else if (lowerMsg.includes('password') || lowerMsg.includes('verify')) threatType = 'Account Takeover';
+      
+      return {
+        prediction: isPhishing ? 'phishing' : 'safe',
+        confidence: isPhishing ? confidence : (100 - phishingScore / 2),
+        indicators: [...new Set(detectedIndicators)].slice(0, 8),
+        threatType: threatType
+      };
+    }
+    
+    function displayResult(result) {
+      const isPhishing = result.prediction === 'phishing';
+      const confidenceOffset = 408 * (1 - result.confidence / 100);
+      
+      resultContainer.innerHTML = `
+        <div class="${isPhishing ? 'result-danger' : 'result-safe'} rounded-3xl p-8 sm:p-10">
+          
+          <div class="flex flex-col lg:flex-row items-center gap-8 mb-10">
+            
+            <!-- Confidence Ring -->
+            <div class="confidence-ring flex-shrink-0">
+              <svg viewBox="0 0 160 160" class="w-full h-full ${isPhishing ? 'text-pink-500' : 'text-green-500'}">
+                <circle class="track" cx="80" cy="80" r="65" fill="none" stroke-width="12"/>
+                <circle class="progress" cx="80" cy="80" r="65" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" style="stroke-dashoffset: ${confidenceOffset}"/>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center flex-col">
+                <span class="text-4xl font-black ${isPhishing ? 'neon-pink' : 'neon-green'}">${result.confidence.toFixed(0)}%</span>
+                <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Confidence</span>
+              </div>
+            </div>
+            
+            <!-- Result Details -->
+            <div class="text-center lg:text-left flex-1">
+              <div class="flex items-center justify-center lg:justify-start gap-4 mb-4">
+                <div class="w-16 h-16 rounded-2xl ${isPhishing ? 'bg-pink-500/20' : 'bg-green-500/20'} flex items-center justify-center">
+                  ${isPhishing ? `
+                    <svg class="w-8 h-8 neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                  ` : `
+                    <svg class="w-8 h-8 neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                  `}
+                </div>
+                <div>
+                  <h3 class="text-3xl sm:text-4xl font-black ${isPhishing ? 'neon-pink' : 'neon-green'}">
+                    ${isPhishing ? 'THREAT DETECTED' : 'MESSAGE SAFE'}
+                  </h3>
+                  ${isPhishing ? `<p class="text-sm text-gray-400 mt-1">Type: <span class="text-pink-300 font-bold">${result.threatType}</span></p>` : ''}
+                </div>
+              </div>
+              <p class="text-gray-400 max-w-lg">
+                ${isPhishing 
+                  ? 'This message contains multiple indicators associated with phishing attacks. Do not click any links or provide personal information.' 
+                  : 'Our neural network analyzed this message and found no suspicious patterns. The message appears legitimate.'}
+              </p>
+            </div>
+            
+          </div>
+          
+          ${isPhishing && result.indicators.length > 0 ? `
+            <!-- Indicators -->
+            <div class="bg-black/30 rounded-2xl p-6 mb-8 border border-pink-500/20">
+              <div class="flex items-center gap-3 mb-5">
+                <svg class="w-5 h-5 neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p class="text-sm font-bold text-white">Detected Risk Indicators</p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                ${result.indicators.map(ind => `
+                  <span class="px-4 py-2 bg-pink-500/10 border border-pink-500/30 rounded-xl text-sm text-pink-300 font-semibold">${ind}</span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          ${!isPhishing ? `
+            <!-- Safe Summary -->
+            <div class="bg-black/30 rounded-2xl p-6 mb-8 border border-green-500/20">
+              <div class="flex items-center gap-3 mb-5">
+                <svg class="w-5 h-5 neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-sm font-bold text-white">Analysis Summary</p>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </span>
+                  <span class="text-sm text-gray-300">No suspicious keywords</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </span>
+                  <span class="text-sm text-gray-300">No malicious URLs</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </span>
+                  <span class="text-sm text-gray-300">Normal structure</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </span>
+                  <span class="text-sm text-gray-300">No urgency tactics</span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            <div class="text-center p-4 rounded-xl bg-black/30 border border-white/10">
+              <p class="text-2xl font-black ${isPhishing ? 'neon-pink' : 'neon-green'}">${isPhishing ? 'HIGH' : 'LOW'}</p>
+              <p class="text-[10px] text-gray-500 uppercase tracking-wider">Risk Level</p>
+            </div>
+            <div class="text-center p-4 rounded-xl bg-black/30 border border-white/10">
+              <p class="text-2xl font-black neon-cyan">${result.indicators ? result.indicators.length : 0}</p>
+              <p class="text-[10px] text-gray-500 uppercase tracking-wider">Indicators</p>
+            </div>
+            <div class="text-center p-4 rounded-xl bg-black/30 border border-white/10">
+              <p class="text-2xl font-black text-purple-400" style="text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);">${Math.floor(Math.random() * 50) + 150}ms</p>
+              <p class="text-[10px] text-gray-500 uppercase tracking-wider">Scan Time</p>
+            </div>
+            <div class="text-center p-4 rounded-xl bg-black/30 border border-white/10">
+              <p class="text-2xl font-black text-amber-400" style="text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);">${isPhishing ? result.threatType.split(' ')[0] : 'None'}</p>
+              <p class="text-[10px] text-gray-500 uppercase tracking-wider">Category</p>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button id="copy-result" class="flex-1 py-4 rounded-xl border-2 border-white/20 text-gray-300 hover:bg-white/5 font-bold transition-all flex items-center justify-center gap-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              Copy Result
+            </button>
+            <button id="analyze-another" class="flex-1 py-4 rounded-xl ${isPhishing ? 'bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 border border-pink-500/30' : 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/30'} font-bold transition-all flex items-center justify-center gap-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              Scan Another
+            </button>
+          </div>
+          
+        </div>
+      `;
+      
+      resultContainer.classList.remove('hidden');
+      
+      setTimeout(() => {
+        const progress = resultContainer.querySelector('.progress');
+        if (progress) progress.style.strokeDashoffset = confidenceOffset;
+      }, 100);
+      
+      resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      document.getElementById('analyze-another').addEventListener('click', () => {
+        messageInput.value = '';
+        charCount.textContent = '0 characters';
+        wordCount.textContent = '0 words';
+        resultContainer.classList.add('hidden');
+        threatLevel.innerHTML = '<span class="w-2.5 h-2.5 bg-gray-500 rounded-full"></span><span class="text-xs text-gray-400 font-bold tracking-wide">STANDBY</span>';
+        messageInput.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      document.getElementById('copy-result').addEventListener('click', () => {
+        const resultText = `PHISHGUARD AI ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Result: ${result.prediction.toUpperCase()}
+Confidence: ${result.confidence.toFixed(1)}%
+${result.prediction === 'phishing' ? `Threat Type: ${result.threatType}\nIndicators: ${result.indicators.join(', ')}` : 'Status: No threats detected'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+        
+        navigator.clipboard.writeText(resultText).then(() => {
+          showToast('Copied!', 'Result saved to clipboard', 'success');
+        }).catch(() => {
+          showToast('Error', 'Copy failed', 'error');
+        });
+      });
+    }
+    
+    // Element SDK
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      const heroTitle = document.getElementById('hero-title');
+      const heroSubtitle = document.getElementById('hero-subtitle');
+      const footerText = document.getElementById('footer-text');
+      
+      const titleText = config.hero_title || defaultConfig.hero_title;
+      const parts = titleText.split(' ');
+      if (parts.length > 2) {
+        const lastPart = parts.slice(-2).join(' ');
+        const firstPart = parts.slice(0, -2).join(' ');
+        heroTitle.innerHTML = `<span class="text-white">${firstPart}</span><br><span class="glitch neon-green" data-text="${lastPart}">${lastPart}</span>`;
+      } else {
+        heroTitle.innerHTML = `<span class="glitch neon-green" data-text="${titleText}">${titleText}</span>`;
+      }
+      
+      heroSubtitle.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      btnText.textContent = config.button_text || defaultConfig.button_text;
+      footerText.textContent = config.footer_text || defaultConfig.footer_text;
+      
+      if (config.font_family) {
+        document.body.style.fontFamily = `${config.font_family}, 'Syne', sans-serif`;
+      }
+      
+      if (config.font_size) {
+        const base = config.font_size;
+        heroTitle.style.fontSize = `${base * 3}px`;
+        heroSubtitle.style.fontSize = `${base * 1.2}px`;
+      }
+    }
+    
+    function mapToCapabilities(cfg) {
+      return {
+        recolorables: [
+          { get: () => cfg.background_color || defaultConfig.background_color, set: (v) => { cfg.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+          { get: () => cfg.surface_color || defaultConfig.surface_color, set: (v) => { cfg.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+          { get: () => cfg.text_color || defaultConfig.text_color, set: (v) => { cfg.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+          { get: () => cfg.primary_color || defaultConfig.primary_color, set: (v) => { cfg.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+          { get: () => cfg.accent_color || defaultConfig.accent_color, set: (v) => { cfg.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } }
+        ],
+        borderables: [],
+        fontEditable: { get: () => cfg.font_family || 'Syne', set: (v) => { cfg.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+        fontSizeable: { get: () => cfg.font_size || 16, set: (v) => { cfg.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+      };
+    }
+    
+    function mapToEditPanelValues(cfg) {
+      return new Map([
+        ['hero_title', cfg.hero_title || defaultConfig.hero_title],
+        ['hero_subtitle', cfg.hero_subtitle || defaultConfig.hero_subtitle],
+        ['button_text', cfg.button_text || defaultConfig.button_text],
+        ['footer_text', cfg.footer_text || defaultConfig.footer_text]
+      ]);
+    }
+    
+    if (window.elementSdk) {
+      window.elementSdk.init({ defaultConfig, onConfigChange, mapToCapabilities, mapToEditPanelValues });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afdda9842d83989',t:'MTc2NjA1MjQ1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

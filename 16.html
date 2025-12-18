@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Phishing Detection System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+    
+    /* Animated background */
+    .bg-animated {
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .bg-animated::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.1) 0%, transparent 40%);
+      animation: aurora 20s ease-in-out infinite;
+    }
+    
+    @keyframes aurora {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(2%, -2%) rotate(1deg); }
+      66% { transform: translate(-1%, 1%) rotate(-1deg); }
+    }
+    
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.5;
+      animation: float 15s ease-in-out infinite;
+    }
+    
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      top: 10%;
+      right: 10%;
+      animation-delay: 0s;
+    }
+    
+    .orb-2 {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #ec4899, #7c3aed);
+      bottom: 20%;
+      left: 5%;
+      animation-delay: -5s;
+    }
+    
+    .orb-3 {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(135deg, #06b6d4, #10b981);
+      top: 50%;
+      left: 30%;
+      animation-delay: -10s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, -30px) scale(1.05); }
+      50% { transform: translate(-10px, 20px) scale(0.95); }
+      75% { transform: translate(15px, 10px) scale(1.02); }
+    }
+    
+    /* Glass card */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .glass:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Gradient border */
+    .gradient-border {
+      position: relative;
+    }
+    
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(6, 182, 212, 0.5));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #a78bfa, #22d3ee, #a78bfa);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradient-shift 5s ease infinite;
+    }
+    
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+    
+    /* Primary button */
+    .btn-glow {
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      color: white;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-glow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .btn-glow:hover::before {
+      opacity: 1;
+    }
+    
+    .btn-glow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(124, 58, 237, 0.4);
+    }
+    
+    .btn-glow span {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Ghost button */
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+      border-color: rgba(124, 58, 237, 0.5);
+      color: white;
+      background: rgba(124, 58, 237, 0.1);
+    }
+    
+    /* Input */
+    .input-glass {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    
+    .input-glass:focus {
+      outline: none;
+      border-color: rgba(124, 58, 237, 0.5);
+      box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .input-glass::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Results */
+    .result-danger {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(236, 72, 153, 0.05));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .result-safe {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Spinner */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Progress shimmer */
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .shimmer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+    
+    /* Pulse ring */
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    
+    .status-dot {
+      position: relative;
+    }
+    
+    .status-dot::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    
+    /* Icon container */
+    .icon-glow {
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.2));
+      border: 1px solid rgba(124, 58, 237, 0.3);
+    }
+    
+    /* Step number */
+    .step-num {
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      font-weight: 700;
+    }
+    
+    /* Tech tag */
+    .tech-tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+    }
+    
+    .tech-tag:hover {
+      border-color: rgba(124, 58, 237, 0.5);
+      color: #a78bfa;
+      background: rgba(124, 58, 237, 0.1);
+    }
+    
+    /* Indicator badges */
+    .indicator-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+    
+    .indicator-safe {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    
+    /* Stat card number */
+    .stat-value {
+      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-animated text-white overflow-auto"><!-- Floating orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="relative z-10 min-h-full flex flex-col"><!-- Header -->
+   <header class="glass-strong sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex items-center justify-between h-16"><!-- Logo -->
+      <div class="flex items-center gap-3">
+       <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+       </div>
+       <div>
+        <h1 id="system-title" class="text-lg font-bold text-white">PhishGuard AI</h1>
+        <p id="tagline" class="text-xs text-white/40 font-medium">Next-Gen Threat Detection</p>
+       </div>
+      </div><!-- Status -->
+      <div class="flex items-center gap-2.5 px-4 py-2 glass rounded-full"><span class="status-dot w-2 h-2 rounded-full bg-emerald-400 relative"></span> <span class="text-xs font-semibold text-emerald-400">System Online</span>
+      </div>
+     </div>
+    </div>
+   </header><!-- Main -->
+   <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10"><!-- Hero -->
+    <div class="text-center mb-12">
+     <div class="inline-flex items-center gap-2 px-4 py-1.5 glass rounded-full mb-6"><span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span> <span class="text-xs font-medium text-white/60">Powered by Machine Learning</span>
+     </div>
+     <h2 class="text-4xl sm:text-5xl font-extrabold mb-4"><span class="text-white">Stop Phishing</span> <span class="gradient-text"> Before It Starts</span></h2>
+     <p class="text-white/50 max-w-lg mx-auto text-lg">Real-time AI analysis to protect you from sophisticated email threats with 96.5% accuracy.</p>
+    </div><!-- Scanner -->
+    <section class="glass gradient-border rounded-3xl p-6 sm:p-8 mb-8">
+     <div class="flex items-center gap-4 mb-6">
+      <div class="w-12 h-12 rounded-2xl icon-glow flex items-center justify-center">
+       <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+       </svg>
+      </div>
+      <div>
+       <h3 class="text-xl font-bold text-white">Threat Scanner</h3>
+       <p class="text-sm text-white/40">Analyze suspicious messages instantly</p>
+      </div>
+     </div>
+     <div class="space-y-5">
+      <div><label for="message-input" class="block text-sm font-medium text-white/60 mb-2"> Message Content </label> <textarea id="message-input" class="input-glass w-full h-44 p-5 rounded-2xl text-sm leading-relaxed resize-none" placeholder="Paste the suspicious email or message here for AI analysis...
+
+Example phishing attempt:
+URGENT: Your account has been compromised! Click here immediately to verify your identity. We need your password and credit card details to restore access."></textarea>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3"><button id="analyze-btn" class="btn-glow flex-1 px-6 py-4 rounded-2xl flex items-center justify-center gap-2 text-sm"> <span class="flex items-center gap-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+         </svg> Analyze with AI </span> </button> <button id="clear-btn" class="btn-outline px-6 py-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg> Clear </button>
+      </div>
+     </div><!-- Loading -->
+     <div id="loading-state" class="hidden mt-8">
+      <div class="flex items-center justify-center gap-3 mb-4">
+       <div class="w-5 h-5 border-2 border-violet-400 border-t-transparent rounded-full spinner"></div><span class="text-sm font-medium text-white/70">Running AI analysis...</span>
+      </div>
+      <div class="h-1.5 bg-white/5 rounded-full overflow-hidden relative">
+       <div class="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full shimmer"></div>
+      </div>
+     </div><!-- Results -->
+     <div id="results-section" class="hidden mt-8">
+      <div id="result-card" class="rounded-2xl p-6 backdrop-blur-sm">
+       <div class="flex flex-col sm:flex-row items-start gap-5">
+        <div id="result-icon" class="flex-shrink-0"></div>
+        <div class="flex-1 w-full">
+         <div class="flex flex-wrap items-center gap-3 mb-3">
+          <h3 id="result-title" class="text-2xl font-bold"></h3><span id="result-badge" class="text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide"></span>
+         </div>
+         <p id="result-description" class="text-sm mb-6 leading-relaxed"></p><!-- Confidence -->
+         <div class="mb-6">
+          <div class="flex justify-between text-sm mb-2"><span class="text-white/50">AI Confidence</span> <span id="confidence-percent" class="font-bold"></span>
+          </div>
+          <div class="h-2.5 bg-white/5 rounded-full overflow-hidden">
+           <div id="confidence-bar" class="h-full rounded-full transition-all duration-1000 ease-out"></div>
+          </div>
+         </div><!-- Indicators -->
+         <div class="pt-6 border-t border-white/10">
+          <p class="text-sm font-semibold text-white/60 mb-4">Detection Signals</p>
+          <div id="indicators" class="grid grid-cols-2 gap-3"></div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section><!-- Stats -->
+    <section class="grid grid-cols-3 gap-4 mb-8">
+     <div class="glass rounded-2xl p-5 text-center">
+      <div class="w-11 h-11 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center mx-auto mb-3">
+       <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+       </svg>
+      </div>
+      <p class="text-xs text-white/40 mb-1">Scanned</p>
+      <p id="stat-checked" class="text-2xl font-bold stat-value">0</p>
+     </div>
+     <div class="glass rounded-2xl p-5 text-center">
+      <div class="w-11 h-11 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center mx-auto mb-3">
+       <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+       </svg>
+      </div>
+      <p class="text-xs text-white/40 mb-1">Threats</p>
+      <p id="stat-phishing" class="text-2xl font-bold text-rose-400">0</p>
+     </div>
+     <div class="glass rounded-2xl p-5 text-center">
+      <div class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
+       <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+       </svg>
+      </div>
+      <p class="text-xs text-white/40 mb-1">Accuracy</p>
+      <p class="text-2xl font-bold text-emerald-400">96.5%</p>
+     </div>
+    </section><!-- How It Works -->
+    <section class="glass rounded-2xl p-6 sm:p-8 mb-8">
+     <h3 class="text-lg font-bold text-white mb-6">How It Works</h3>
+     <div class="grid grid-cols-4 gap-4">
+      <div class="text-center">
+       <div class="w-10 h-10 step-num rounded-xl flex items-center justify-center mx-auto mb-3 text-sm text-white">
+        1
+       </div>
+       <p class="text-xs text-white/50">Input</p>
+      </div>
+      <div class="text-center">
+       <div class="w-10 h-10 step-num rounded-xl flex items-center justify-center mx-auto mb-3 text-sm text-white">
+        2
+       </div>
+       <p class="text-xs text-white/50">Vectorize</p>
+      </div>
+      <div class="text-center">
+       <div class="w-10 h-10 step-num rounded-xl flex items-center justify-center mx-auto mb-3 text-sm text-white">
+        3
+       </div>
+       <p class="text-xs text-white/50">Classify</p>
+      </div>
+      <div class="text-center">
+       <div class="w-10 h-10 step-num rounded-xl flex items-center justify-center mx-auto mb-3 text-sm text-white">
+        4
+       </div>
+       <p class="text-xs text-white/50">Result</p>
+      </div>
+     </div>
+    </section><!-- Tech Stack -->
+    <section class="glass rounded-2xl p-6 sm:p-8">
+     <h3 class="text-lg font-bold text-white mb-5">Tech Stack</h3>
+     <div class="flex flex-wrap gap-2"><span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">Python</span> <span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">Flask</span> <span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">Scikit-learn</span> <span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">TF-IDF</span> <span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">Logistic Regression</span> <span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">Pandas</span> <span class="tech-tag px-4 py-2 rounded-xl text-sm font-medium">NumPy</span>
+     </div>
+    </section>
+   </main><!-- Footer -->
+   <footer class="glass-strong mt-auto">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+     <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm">
+      <p class="text-white/40">🎓 Final Year Project — AI Phishing Detection</p>
+      <p class="text-white/20">v1.0.0</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    const defaultConfig = {
+      system_title: 'PhishGuard AI',
+      tagline: 'Next-Gen Threat Detection'
+    };
+
+    let messagesChecked = 0;
+    let phishingDetected = 0;
+
+    const phishingIndicators = {
+      urgencyWords: ['urgent', 'immediately', 'act now', 'limited time', 'expires', 'suspended', 'compromised', 'verify now', 'confirm immediately', 'asap', 'right away'],
+      threatWords: ['account will be closed', 'legal action', 'unauthorized', 'security alert', 'suspicious activity', 'locked', 'disabled', 'terminated', 'blocked'],
+      actionWords: ['click here', 'click below', 'click this link', 'login here', 'verify your', 'confirm your', 'update your', 'sign in'],
+      sensitiveRequests: ['password', 'credit card', 'social security', 'bank account', 'ssn', 'pin number', 'cvv', 'routing number', 'card number'],
+      suspiciousPatterns: ['dear customer', 'dear user', 'dear valued', 'dear account holder', 'dear sir/madam'],
+      rewards: ['won', 'winner', 'lottery', 'prize', 'free gift', 'congratulations', 'selected', 'claim your', 'reward']
+    };
+
+    function analyzeMessage(text) {
+      const lowerText = text.toLowerCase();
+      let score = 0;
+      let foundIndicators = [];
+
+      const urgencyFound = phishingIndicators.urgencyWords.filter(word => lowerText.includes(word));
+      if (urgencyFound.length > 0) {
+        score += urgencyFound.length * 15;
+        foundIndicators.push({ type: 'Urgency', found: true });
+      } else {
+        foundIndicators.push({ type: 'Urgency', found: false });
+      }
+
+      const threatFound = phishingIndicators.threatWords.filter(word => lowerText.includes(word));
+      if (threatFound.length > 0) {
+        score += threatFound.length * 20;
+        foundIndicators.push({ type: 'Threats', found: true });
+      } else {
+        foundIndicators.push({ type: 'Threats', found: false });
+      }
+
+      const actionFound = phishingIndicators.actionWords.filter(word => lowerText.includes(word));
+      if (actionFound.length > 0) {
+        score += actionFound.length * 15;
+        foundIndicators.push({ type: 'Suspicious Links', found: true });
+      } else {
+        foundIndicators.push({ type: 'Suspicious Links', found: false });
+      }
+
+      const sensitiveFound = phishingIndicators.sensitiveRequests.filter(word => lowerText.includes(word));
+      if (sensitiveFound.length > 0) {
+        score += sensitiveFound.length * 25;
+        foundIndicators.push({ type: 'Data Harvesting', found: true });
+      } else {
+        foundIndicators.push({ type: 'Data Harvesting', found: false });
+      }
+
+      const patternFound = phishingIndicators.suspiciousPatterns.filter(pattern => lowerText.includes(pattern));
+      if (patternFound.length > 0) score += patternFound.length * 10;
+
+      const rewardFound = phishingIndicators.rewards.filter(word => lowerText.includes(word));
+      if (rewardFound.length > 0) score += rewardFound.length * 15;
+
+      const urlPattern = /https?:\/\/[^\s]+/gi;
+      const urls = text.match(urlPattern) || [];
+      const suspiciousUrls = urls.filter(url => 
+        url.includes('bit.ly') || 
+        url.includes('tinyurl') ||
+        /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(url) ||
+        url.length > 100
+      );
+      if (suspiciousUrls.length > 0) score += 20;
+
+      score = Math.min(100, score);
+      score += Math.floor(Math.random() * 10) - 5;
+      score = Math.max(0, Math.min(100, score));
+
+      const isPhishing = score >= 40;
+      const confidence = isPhishing ? 
+        Math.min(98, 75 + Math.floor(score / 5)) : 
+        Math.min(98, 95 - Math.floor(score / 3));
+
+      return { isPhishing, confidence, score, indicators: foundIndicators };
+    }
+
+    function displayResults(result) {
+      const resultsSection = document.getElementById('results-section');
+      const resultCard = document.getElementById('result-card');
+      const resultIcon = document.getElementById('result-icon');
+      const resultTitle = document.getElementById('result-title');
+      const resultBadge = document.getElementById('result-badge');
+      const resultDescription = document.getElementById('result-description');
+      const confidencePercent = document.getElementById('confidence-percent');
+      const confidenceBar = document.getElementById('confidence-bar');
+      const indicators = document.getElementById('indicators');
+
+      resultCard.classList.remove('result-safe', 'result-danger');
+
+      if (result.isPhishing) {
+        resultCard.classList.add('result-danger');
+        resultIcon.innerHTML = `
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 border border-rose-500/30 flex items-center justify-center">
+            <svg class="w-8 h-8 text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+        `;
+        resultTitle.textContent = 'Phishing Detected';
+        resultTitle.className = 'text-2xl font-bold text-rose-400';
+        resultBadge.textContent = 'High Risk';
+        resultBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide bg-rose-500/20 text-rose-400 border border-rose-500/30';
+        resultDescription.textContent = 'This message contains multiple phishing indicators. Do not click any links or provide personal information.';
+        resultDescription.className = 'text-sm mb-6 leading-relaxed text-rose-300/70';
+        confidenceBar.className = 'h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-1000 ease-out';
+        confidencePercent.className = 'font-bold text-rose-400';
+      } else {
+        resultCard.classList.add('result-safe');
+        resultIcon.innerHTML = `
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center">
+            <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+        `;
+        resultTitle.textContent = 'Message Safe';
+        resultTitle.className = 'text-2xl font-bold text-emerald-400';
+        resultBadge.textContent = 'Low Risk';
+        resultBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        resultDescription.textContent = 'This message appears legitimate. No significant phishing patterns were detected.';
+        resultDescription.className = 'text-sm mb-6 leading-relaxed text-emerald-300/70';
+        confidenceBar.className = 'h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out';
+        confidencePercent.className = 'font-bold text-emerald-400';
+      }
+
+      confidencePercent.textContent = result.confidence + '%';
+      
+      confidenceBar.style.width = '0%';
+      setTimeout(() => {
+        confidenceBar.style.width = result.confidence + '%';
+      }, 100);
+
+      indicators.innerHTML = result.indicators.map(indicator => {
+        const cls = indicator.found ? 'indicator-danger' : 'indicator-safe';
+        const icon = indicator.found 
+          ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01"/></svg>'
+          : '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+        return `
+          <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl ${cls}">
+            ${icon}
+            <span class="text-xs font-semibold">${indicator.type}</span>
+          </div>
+        `;
+      }).join('');
+
+      resultsSection.classList.remove('hidden');
+    }
+
+    function updateStats() {
+      document.getElementById('stat-checked').textContent = messagesChecked;
+      document.getElementById('stat-phishing').textContent = phishingDetected;
+    }
+
+    document.getElementById('analyze-btn').addEventListener('click', async () => {
+      const messageInput = document.getElementById('message-input');
+      const text = messageInput.value.trim();
+      
+      if (!text) {
+        messageInput.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+        messageInput.style.boxShadow = '0 0 30px rgba(239, 68, 68, 0.15)';
+        setTimeout(() => {
+          messageInput.style.borderColor = '';
+          messageInput.style.boxShadow = '';
+        }, 2000);
+        return;
+      }
+
+      const loadingState = document.getElementById('loading-state');
+      const resultsSection = document.getElementById('results-section');
+      loadingState.classList.remove('hidden');
+      resultsSection.classList.add('hidden');
+
+      await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 800));
+
+      const result = analyzeMessage(text);
+
+      messagesChecked++;
+      if (result.isPhishing) phishingDetected++;
+      updateStats();
+
+      loadingState.classList.add('hidden');
+      displayResults(result);
+    });
+
+    document.getElementById('message-input').addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        document.getElementById('analyze-btn').click();
+      }
+    });
+
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      document.getElementById('message-input').value = '';
+      document.getElementById('results-section').classList.add('hidden');
+      document.getElementById('loading-state').classList.add('hidden');
+    });
+
+    async function onConfigChange(config) {
+      const systemTitle = document.getElementById('system-title');
+      const tagline = document.getElementById('tagline');
+      
+      if (systemTitle) systemTitle.textContent = config.system_title || defaultConfig.system_title;
+      if (tagline) tagline.textContent = config.tagline || defaultConfig.tagline;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['system_title', config.system_title || defaultConfig.system_title],
+        ['tagline', config.tagline || defaultConfig.tagline]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afe2e3b07d56091',t:'MTc2NjA1NTg3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

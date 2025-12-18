@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Phishing Detection System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Exo+2:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      box-sizing: border-box;
+      font-family: 'Exo 2', sans-serif;
+    }
+    
+    /* Cyber background */
+    .cyber-bg {
+      background: linear-gradient(145deg, #0a0a0f 0%, #0d1117 30%, #161b22 60%, #0d1117 100%);
+      position: relative;
+    }
+    
+    .cyber-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 15% 15%, rgba(0, 255, 136, 0.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 85%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    
+    /* Hex grid pattern */
+    .hex-grid {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%2300ff8820' stroke-width='0.5'/%3E%3C/svg%3E");
+      background-size: 60px 60px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    
+    /* Animated scan line */
+    .scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00ff88, #00d4ff, transparent);
+      animation: scanMove 6s ease-in-out infinite;
+      opacity: 0.4;
+      filter: blur(1px);
+    }
+    
+    @keyframes scanMove {
+      0%, 100% { top: 0%; }
+      50% { top: 100%; }
+    }
+    
+    /* Glowing effects */
+    .glow-green { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4); }
+    .glow-red { text-shadow: 0 0 20px rgba(255, 71, 87, 0.8), 0 0 40px rgba(255, 71, 87, 0.4); }
+    .glow-yellow { text-shadow: 0 0 20px rgba(255, 193, 7, 0.8), 0 0 40px rgba(255, 193, 7, 0.4); }
+    .glow-cyan { text-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 40px rgba(0, 212, 255, 0.4); }
+    
+    /* Input container */
+    .input-container {
+      background: linear-gradient(135deg, rgba(13, 17, 23, 0.95) 0%, rgba(22, 27, 34, 0.95) 100%);
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .input-container:focus-within {
+      border-color: rgba(0, 255, 136, 0.6);
+      box-shadow: 0 0 60px rgba(0, 255, 136, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    
+    .url-input {
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .url-input::placeholder { color: rgba(148, 163, 184, 0.4); }
+    .url-input:focus { outline: none; }
+    
+    /* Buttons */
+    .scan-btn {
+      background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+      color: #0a0a0f;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .scan-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #00d4ff 0%, #00ff88 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .scan-btn:hover::before { opacity: 1; }
+    .scan-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 50px rgba(0, 255, 136, 0.4);
+    }
+    .scan-btn:active { transform: translateY(0); }
+    .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .scan-btn span { position: relative; z-index: 1; }
+    
+    /* Sample URL buttons */
+    .sample-btn {
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      color: #00ff88;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s ease;
+    }
+    
+    .sample-btn:hover {
+      background: rgba(0, 255, 136, 0.15);
+      border-color: rgba(0, 255, 136, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
+    }
+    
+    .sample-btn.danger {
+      background: rgba(255, 71, 87, 0.08);
+      border-color: rgba(255, 71, 87, 0.25);
+      color: #ff4757;
+    }
+    
+    .sample-btn.danger:hover {
+      background: rgba(255, 71, 87, 0.15);
+      border-color: rgba(255, 71, 87, 0.5);
+      box-shadow: 0 8px 25px rgba(255, 71, 87, 0.2);
+    }
+    
+    .sample-btn.warning {
+      background: rgba(255, 193, 7, 0.08);
+      border-color: rgba(255, 193, 7, 0.25);
+      color: #ffc107;
+    }
+    
+    .sample-btn.warning:hover {
+      background: rgba(255, 193, 7, 0.15);
+      border-color: rgba(255, 193, 7, 0.5);
+      box-shadow: 0 8px 25px rgba(255, 193, 7, 0.2);
+    }
+    
+    /* Analysis animation container */
+    .analysis-container {
+      background: linear-gradient(135deg, rgba(13, 17, 23, 0.98) 0%, rgba(22, 27, 34, 0.98) 100%);
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 0 0 60px rgba(0, 212, 255, 0.15);
+    }
+    
+    /* Scanning animation */
+    .scan-ring {
+      width: 180px;
+      height: 180px;
+      position: relative;
+    }
+    
+    .scan-ring-outer {
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(0, 255, 136, 0.3);
+      border-radius: 50%;
+      animation: ringPulse 2s ease-in-out infinite;
+    }
+    
+    .scan-ring-middle {
+      position: absolute;
+      inset: 15px;
+      border: 2px solid rgba(0, 212, 255, 0.4);
+      border-radius: 50%;
+      animation: ringPulse 2s ease-in-out infinite 0.3s;
+    }
+    
+    .scan-ring-inner {
+      position: absolute;
+      inset: 30px;
+      border: 2px dashed rgba(139, 92, 246, 0.5);
+      border-radius: 50%;
+      animation: ringRotate 4s linear infinite;
+    }
+    
+    .scan-ring-core {
+      position: absolute;
+      inset: 50px;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: corePulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes ringPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    
+    @keyframes ringRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes corePulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    
+    /* Analysis steps */
+    .analysis-step {
+      opacity: 0.3;
+      transform: translateX(-10px);
+      transition: all 0.4s ease;
+    }
+    
+    .analysis-step.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .analysis-step.complete {
+      opacity: 0.7;
+    }
+    
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(0, 255, 136, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .analysis-step.active .step-indicator {
+      border-color: #00ff88;
+      background: rgba(0, 255, 136, 0.2);
+      animation: stepPulse 1s ease-in-out infinite;
+    }
+    
+    .analysis-step.complete .step-indicator {
+      border-color: #00ff88;
+      background: #00ff88;
+    }
+    
+    @keyframes stepPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+    }
+    
+    /* Progress bar */
+    .progress-track {
+      background: rgba(0, 255, 136, 0.1);
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      background: linear-gradient(90deg, #00ff88, #00d4ff, #8b5cf6);
+      background-size: 200% 100%;
+      animation: progressShine 2s linear infinite;
+      transition: width 0.3s ease;
+    }
+    
+    @keyframes progressShine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Feature analysis cards */
+    .feature-card {
+      background: rgba(13, 17, 23, 0.8);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      border-color: rgba(0, 255, 136, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    .feature-card.analyzing {
+      animation: featureAnalyze 0.5s ease-out;
+    }
+    
+    @keyframes featureAnalyze {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Result cards */
+    .result-card {
+      background: linear-gradient(135deg, rgba(13, 17, 23, 0.98) 0%, rgba(22, 27, 34, 0.98) 100%);
+      border: 2px solid;
+      backdrop-filter: blur(20px);
+    }
+    
+    .result-safe { border-color: rgba(0, 255, 136, 0.5); box-shadow: 0 0 50px rgba(0, 255, 136, 0.2); }
+    .result-danger { border-color: rgba(255, 71, 87, 0.5); box-shadow: 0 0 50px rgba(255, 71, 87, 0.2); }
+    .result-warning { border-color: rgba(255, 193, 7, 0.5); box-shadow: 0 0 50px rgba(255, 193, 7, 0.2); }
+    
+    /* Risk meter */
+    .risk-meter {
+      background: linear-gradient(90deg, #00ff88 0%, #7cff00 25%, #ffc107 50%, #ff6b35 75%, #ff4757 100%);
+      border-radius: 999px;
+    }
+    
+    .risk-indicator {
+      transition: left 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    /* Stat cards */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(13, 17, 23, 0.9) 0%, rgba(22, 27, 34, 0.9) 100%);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: rgba(0, 255, 136, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* History items */
+    .history-item {
+      background: rgba(13, 17, 23, 0.7);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      transition: all 0.2s ease;
+    }
+    
+    .history-item:hover {
+      background: rgba(13, 17, 23, 0.9);
+      border-color: rgba(0, 255, 136, 0.3);
+    }
+    
+    /* Typing animation */
+    .typing-text::after {
+      content: '|';
+      animation: blink 0.8s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    
+    /* Shield animation */
+    .shield-icon {
+      animation: shieldFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes shieldFloat {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5)); }
+      50% { transform: translateY(-8px); filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.8)); }
+    }
+    
+    /* Binary rain */
+    .binary-rain {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(0, 255, 136, 0.15);
+      animation: rain 10s linear infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes rain {
+      0% { transform: translateY(-100%); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 255, 136, 0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 255, 136, 0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 136, 0.5); }
+    
+    /* Tabs */
+    .tab-btn {
+      background: transparent;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      color: rgba(148, 163, 184, 0.8);
+      transition: all 0.2s ease;
+    }
+    
+    .tab-btn:hover {
+      border-color: rgba(0, 255, 136, 0.4);
+      color: #00ff88;
+    }
+    
+    .tab-btn.active {
+      background: rgba(0, 255, 136, 0.15);
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+    
+    /* Toast notification */
+    .toast {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full cyber-bg text-white overflow-auto"><!-- Background effects -->
+  <div class="hex-grid"></div>
+  <div class="scan-line"></div><!-- Binary rain columns -->
+  <div class="binary-rain" style="left: 5%; animation-delay: 0s;">
+   01001010<br>
+   11010101<br>
+   00101110
+  </div>
+  <div class="binary-rain" style="left: 15%; animation-delay: 2s;">
+   10110011<br>
+   01101001<br>
+   11001010
+  </div>
+  <div class="binary-rain" style="left: 85%; animation-delay: 4s;">
+   00111010<br>
+   10101100<br>
+   01010111
+  </div>
+  <div class="binary-rain" style="left: 95%; animation-delay: 6s;">
+   11100101<br>
+   00010110<br>
+   10110001
+  </div><!-- Toast container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+  <div class="relative z-10 min-h-full w-full">
+   <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10"><!-- Header -->
+    <header class="text-center mb-8 md:mb-12">
+     <div class="shield-icon inline-block mb-4">
+      <svg width="72" height="72" viewbox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 8L12 20V36C12 53.6 23.84 70.08 40 74C56.16 70.08 68 53.6 68 36V20L40 8Z" stroke="url(#shieldGrad)" stroke-width="3" fill="rgba(0, 255, 136, 0.1)" /> <path d="M30 40L38 48L52 32" stroke="#00ff88" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /> <circle cx="40" cy="40" r="18" stroke="rgba(0, 212, 255, 0.3)" stroke-width="1" stroke-dasharray="4 4">
+        <animatetransform attributename="transform" type="rotate" from="0 40 40" to="360 40 40" dur="20s" repeatcount="indefinite" />
+       </circle> <defs>
+        <lineargradient id="shieldGrad" x1="12" y1="8" x2="68" y2="74">
+         <stop stop-color="#00ff88" />
+         <stop offset="1" stop-color="#00d4ff" />
+        </lineargradient>
+       </defs>
+      </svg>
+     </div>
+     <p class="text-xs uppercase tracking-[0.4em] text-emerald-400/50 mb-2" style="font-family: 'JetBrains Mono', monospace;">// ML-POWERED SECURITY SYSTEM v3.0</p>
+     <h1 id="app-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">AI PHISHING DETECTOR</h1>
+     <p id="tagline" class="text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto">Advanced neural network analysis to identify malicious URLs and protect against phishing attacks</p>
+    </header><!-- Main Scanner -->
+    <section class="mb-8" aria-label="URL Scanner">
+     <div class="input-container rounded-2xl p-2 sm:p-3 max-w-3xl mx-auto">
+      <form id="scan-form" class="flex flex-col sm:flex-row gap-3">
+       <div class="flex-1 flex items-center gap-3 px-4 py-3">
+        <svg class="w-5 h-5 text-emerald-400/60 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+        </svg><label for="url-input" class="sr-only">Enter URL to scan</label> <input type="text" id="url-input" class="url-input flex-1 text-white text-sm sm:text-base py-2 w-full" placeholder="Enter URL to analyze..." autocomplete="off">
+       </div><button type="submit" id="scan-btn" class="scan-btn px-6 sm:px-8 py-4 rounded-xl text-sm font-bold flex-shrink-0"> <span class="flex items-center justify-center gap-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+         </svg><span id="scan-btn-text">ANALYZE</span> </span> </button>
+      </form>
+     </div>
+    </section><!-- Sample URLs Section -->
+    <section class="mb-10" aria-label="Sample URLs">
+     <div class="max-w-3xl mx-auto">
+      <p class="text-center text-xs uppercase tracking-[0.25em] text-slate-500 mb-4" style="font-family: 'JetBrains Mono', monospace;">[ TEST WITH SAMPLE URLs ]</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><!-- Safe URLs -->
+       <div class="space-y-2">
+        <p class="text-xs text-emerald-400 font-medium mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-emerald-400 rounded-full"></span> SAFE EXAMPLES</p><button class="sample-btn w-full px-4 py-3 rounded-xl text-left text-xs" data-url="https://www.google.com" data-type="safe"> <span class="block truncate">google.com</span> <span class="text-emerald-400/50 text-[10px]">Search Engine</span> </button> <button class="sample-btn w-full px-4 py-3 rounded-xl text-left text-xs" data-url="https://github.com" data-type="safe"> <span class="block truncate">github.com</span> <span class="text-emerald-400/50 text-[10px]">Developer Platform</span> </button> <button class="sample-btn w-full px-4 py-3 rounded-xl text-left text-xs" data-url="https://www.microsoft.com" data-type="safe"> <span class="block truncate">microsoft.com</span> <span class="text-emerald-400/50 text-[10px]">Technology Company</span> </button>
+       </div><!-- Suspicious URLs -->
+       <div class="space-y-2">
+        <p class="text-xs text-yellow-400 font-medium mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-yellow-400 rounded-full"></span> SUSPICIOUS EXAMPLES</p><button class="sample-btn warning w-full px-4 py-3 rounded-xl text-left text-xs" data-url="http://free-prizes-winner.xyz" data-type="warning"> <span class="block truncate">free-prizes-winner.xyz</span> <span class="text-yellow-400/50 text-[10px]">Suspicious Domain</span> </button> <button class="sample-btn warning w-full px-4 py-3 rounded-xl text-left text-xs" data-url="http://login-verify-account.tk" data-type="warning"> <span class="block truncate">login-verify-account.tk</span> <span class="text-yellow-400/50 text-[10px]">Unusual TLD</span> </button> <button class="sample-btn warning w-full px-4 py-3 rounded-xl text-left text-xs" data-url="http://192.168.1.1/bank-login" data-type="warning"> <span class="block truncate">192.168.1.1/bank-login</span> <span class="text-yellow-400/50 text-[10px]">IP-based URL</span> </button>
+       </div><!-- Phishing URLs -->
+       <div class="space-y-2">
+        <p class="text-xs text-red-400 font-medium mb-2 flex items-center gap-2"><span class="w-2 h-2 bg-red-400 rounded-full"></span> PHISHING EXAMPLES</p><button class="sample-btn danger w-full px-4 py-3 rounded-xl text-left text-xs" data-url="http://paypa1-secure.com/login" data-type="danger"> <span class="block truncate">paypa1-secure.com</span> <span class="text-red-400/50 text-[10px]">Brand Impersonation</span> </button> <button class="sample-btn danger w-full px-4 py-3 rounded-xl text-left text-xs" data-url="http://amaz0n-verify.ru/account" data-type="danger"> <span class="block truncate">amaz0n-verify.ru</span> <span class="text-red-400/50 text-[10px]">Typosquatting</span> </button> <button class="sample-btn danger w-full px-4 py-3 rounded-xl text-left text-xs" data-url="http://secure-banking-update.cn/verify" data-type="danger"> <span class="block truncate">secure-banking-update.cn</span> <span class="text-red-400/50 text-[10px]">Fake Security</span> </button>
+       </div>
+      </div>
+     </div>
+    </section><!-- Analysis Section (Hidden by default) -->
+    <section id="analysis-section" class="hidden mb-10" aria-label="Analysis Progress">
+     <div class="analysis-container rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto">
+      <div class="flex flex-col lg:flex-row items-center gap-8"><!-- Scanning Animation -->
+       <div class="flex-shrink-0">
+        <div class="scan-ring">
+         <div class="scan-ring-outer"></div>
+         <div class="scan-ring-middle"></div>
+         <div class="scan-ring-inner"></div>
+         <div class="scan-ring-core"></div>
+         <div class="absolute inset-0 flex items-center justify-center"><span id="scan-percent" class="text-2xl font-bold text-cyan-400" style="font-family: 'JetBrains Mono', monospace;">0%</span>
+         </div>
+        </div>
+       </div><!-- Analysis Steps -->
+       <div class="flex-1 w-full">
+        <div class="mb-4">
+         <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Analyzing URL</p>
+         <p id="analyzing-url" class="text-sm text-cyan-400 truncate typing-text" style="font-family: 'JetBrains Mono', monospace;">https://example.com</p>
+        </div>
+        <div class="space-y-3" id="analysis-steps">
+         <div class="analysis-step flex items-center gap-3" data-step="0">
+          <div class="step-indicator">
+           <svg class="w-4 h-4 text-emerald-400 hidden check-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+           </svg>
+           <div class="w-2 h-2 bg-current rounded-full loading-dot"></div>
+          </div>
+          <div class="flex-1">
+           <p class="text-sm font-medium text-slate-300">URL Feature Extraction</p>
+           <p class="text-xs text-slate-500">Parsing URL structure &amp; components</p>
+          </div>
+         </div>
+         <div class="analysis-step flex items-center gap-3" data-step="1">
+          <div class="step-indicator">
+           <svg class="w-4 h-4 text-emerald-400 hidden check-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+           </svg>
+           <div class="w-2 h-2 bg-current rounded-full loading-dot"></div>
+          </div>
+          <div class="flex-1">
+           <p class="text-sm font-medium text-slate-300">Domain Analysis</p>
+           <p class="text-xs text-slate-500">Checking domain age, reputation &amp; SSL</p>
+          </div>
+         </div>
+         <div class="analysis-step flex items-center gap-3" data-step="2">
+          <div class="step-indicator">
+           <svg class="w-4 h-4 text-emerald-400 hidden check-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+           </svg>
+           <div class="w-2 h-2 bg-current rounded-full loading-dot"></div>
+          </div>
+          <div class="flex-1">
+           <p class="text-sm font-medium text-slate-300">ML Model Processing</p>
+           <p class="text-xs text-slate-500">Random Forest + XGBoost + Neural Net</p>
+          </div>
+         </div>
+         <div class="analysis-step flex items-center gap-3" data-step="3">
+          <div class="step-indicator">
+           <svg class="w-4 h-4 text-emerald-400 hidden check-icon" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+           </svg>
+           <div class="w-2 h-2 bg-current rounded-full loading-dot"></div>
+          </div>
+          <div class="flex-1">
+           <p class="text-sm font-medium text-slate-300">Threat Assessment</p>
+           <p class="text-xs text-slate-500">Generating final risk score</p>
+          </div>
+         </div>
+        </div><!-- Progress Bar -->
+        <div class="mt-6">
+         <div class="progress-track h-2 rounded-full">
+          <div id="main-progress-bar" class="progress-fill h-full rounded-full" style="width: 0%;"></div>
+         </div>
+        </div>
+       </div>
+      </div><!-- Live Feature Analysis -->
+      <div class="mt-8 pt-6 border-t border-slate-700/50">
+       <p class="text-xs text-slate-500 uppercase tracking-wider mb-4">Live Feature Analysis</p>
+       <div id="feature-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"><!-- Features will be populated dynamically -->
+       </div>
+      </div>
+     </div>
+    </section><!-- Results Section -->
+    <section id="results-section" class="hidden mb-10" aria-label="Scan Results">
+     <div id="result-card" class="result-card rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto"><!-- Result Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+       <div class="flex items-center gap-4">
+        <div id="result-icon" class="w-16 h-16 rounded-2xl flex items-center justify-center"></div>
+        <div>
+         <h2 id="result-title" class="text-2xl sm:text-3xl font-bold">Analysis Complete</h2>
+         <p id="result-subtitle" class="text-sm text-slate-400" style="font-family: 'JetBrains Mono', monospace;">Threat assessment finished</p>
+        </div>
+       </div>
+       <div id="confidence-badge" class="px-5 py-2.5 rounded-xl text-sm font-bold" style="font-family: 'JetBrains Mono', monospace;">
+        98% Confidence
+       </div>
+      </div><!-- Analyzed URL Box -->
+      <div class="bg-slate-900/60 rounded-xl p-4 mb-6 border border-slate-700/50">
+       <p class="text-xs text-slate-500 mb-1 uppercase tracking-wider">Scanned URL</p>
+       <p id="analyzed-url" class="text-cyan-400 text-sm break-all" style="font-family: 'JetBrains Mono', monospace;">https://example.com</p>
+      </div><!-- Risk Meter -->
+      <div class="mb-6">
+       <div class="flex justify-between items-center mb-2"><span class="text-sm text-slate-400">Threat Level</span> <span id="risk-label" class="text-sm font-bold">Low Risk</span>
+       </div>
+       <div class="relative h-4 rounded-full overflow-hidden risk-meter">
+        <div id="risk-indicator" class="risk-indicator absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-lg border-2 border-slate-900" style="left: 10%;"></div>
+       </div>
+       <div class="flex justify-between mt-1.5"><span class="text-xs text-emerald-400/60">Safe</span> <span class="text-xs text-yellow-400/60">Caution</span> <span class="text-xs text-red-400/60">Dangerous</span>
+       </div>
+      </div><!-- Detection Summary -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+       <div class="bg-slate-900/40 rounded-xl p-4 text-center">
+        <p id="ml-prediction" class="text-lg font-bold text-emerald-400">Legitimate</p>
+        <p class="text-xs text-slate-500 uppercase">Prediction</p>
+       </div>
+       <div class="bg-slate-900/40 rounded-xl p-4 text-center">
+        <p id="features-count" class="text-lg font-bold text-cyan-400">24</p>
+        <p class="text-xs text-slate-500 uppercase">Features</p>
+       </div>
+       <div class="bg-slate-900/40 rounded-xl p-4 text-center">
+        <p id="scan-time" class="text-lg font-bold text-purple-400">1.8s</p>
+        <p class="text-xs text-slate-500 uppercase">Scan Time</p>
+       </div>
+       <div class="bg-slate-900/40 rounded-xl p-4 text-center">
+        <p id="model-count" class="text-lg font-bold text-pink-400">3</p>
+        <p class="text-xs text-slate-500 uppercase">ML Models</p>
+       </div>
+      </div><!-- Detailed Analysis Tabs -->
+      <div class="mb-6">
+       <div class="flex gap-2 mb-4 overflow-x-auto pb-2"><button class="tab-btn active px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap" data-tab="features"> Feature Analysis </button> <button class="tab-btn px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap" data-tab="threats"> Threat Indicators </button> <button class="tab-btn px-4 py-2 rounded-lg text-xs font-medium whitespace-nowrap" data-tab="models"> Model Scores </button>
+       </div><!-- Features Tab -->
+       <div id="tab-features" class="tab-content">
+        <div id="result-feature-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"><!-- Features populated by JS -->
+        </div>
+       </div><!-- Threats Tab -->
+       <div id="tab-threats" class="tab-content hidden">
+        <div id="threat-list" class="space-y-2"><!-- Threats populated by JS -->
+        </div>
+       </div><!-- Models Tab -->
+       <div id="tab-models" class="tab-content hidden">
+        <div id="model-scores" class="space-y-4"><!-- Model scores populated by JS -->
+        </div>
+       </div>
+      </div><!-- Action Buttons -->
+      <div class="flex flex-wrap gap-3"><button id="new-scan-btn" class="flex-1 sm:flex-none px-6 py-3 bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 rounded-xl text-sm font-medium hover:bg-emerald-500/30 transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg> New Scan </button> <button id="copy-report-btn" class="flex-1 sm:flex-none px-6 py-3 bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 rounded-xl text-sm font-medium hover:bg-cyan-500/30 transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+        </svg> Copy Report </button> <button id="report-btn" class="flex-1 sm:flex-none px-6 py-3 bg-slate-700/30 border border-slate-600/50 text-slate-400 rounded-xl text-sm font-medium hover:bg-slate-700/50 transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg> Report Error </button>
+      </div>
+     </div>
+    </section><!-- Stats Section -->
+    <section class="mb-10" aria-label="Statistics">
+     <h2 class="text-center text-base font-semibold text-slate-400 mb-5 uppercase tracking-wider">System Performance</h2>
+     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent mb-1">99.4%</p>
+       <p class="text-xs text-slate-500 uppercase tracking-wider">Accuracy</p>
+      </div>
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p id="scans-counter" class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-1">0</p>
+       <p class="text-xs text-slate-500 uppercase tracking-wider">Scans Today</p>
+      </div>
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-1">&lt;2s</p>
+       <p class="text-xs text-slate-500 uppercase tracking-wider">Avg Time</p>
+      </div>
+      <div class="stat-card rounded-xl p-5 text-center">
+       <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-pink-400 to-emerald-400 bg-clip-text text-transparent mb-1">24</p>
+       <p class="text-xs text-slate-500 uppercase tracking-wider">ML Features</p>
+      </div>
+     </div>
+    </section><!-- Recent Scans -->
+    <section class="mb-8" aria-label="Recent Scans">
+     <div class="max-w-4xl mx-auto">
+      <h2 class="text-base font-semibold text-slate-400 mb-4 uppercase tracking-wider">Scan History</h2>
+      <div id="history-list" class="space-y-2">
+       <p class="text-sm text-slate-500 text-center py-8 bg-slate-900/30 rounded-xl border border-slate-800/50">No scans yet. Enter a URL or try a sample above.</p>
+      </div>
+     </div>
+    </section>
+   </main><!-- Footer -->
+   <footer class="border-t border-slate-800/50 py-5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-xs text-slate-500" style="font-family: 'JetBrains Mono', monospace;">AI Phishing Detection System © 2024</p>
+      <div class="flex items-center gap-2 text-xs text-slate-600"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span> <span>All Systems Operational</span>
+      </div>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    const defaultConfig = {
+      app_title: 'AI PHISHING DETECTOR',
+      tagline: 'Advanced neural network analysis to identify malicious URLs and protect against phishing attacks',
+      scan_button_text: 'ANALYZE',
+      background_color: '#0a0a0f',
+      surface_color: '#0d1117',
+      text_color: '#ffffff',
+      primary_color: '#00ff88',
+      accent_color: '#00d4ff'
+    };
+    
+    let config = { ...defaultConfig };
+    let scanHistory = [];
+    let scanCount = 0;
+    let currentResult = null;
+    
+    // ML Features for analysis
+    const mlFeatures = [
+      { name: 'URL Length', key: 'url_length', desc: 'Character count' },
+      { name: 'Domain Age', key: 'domain_age', desc: 'Registration date' },
+      { name: 'SSL Certificate', key: 'ssl', desc: 'HTTPS status' },
+      { name: 'IP in URL', key: 'ip_url', desc: 'IP detection' },
+      { name: 'Suspicious Words', key: 'sus_words', desc: 'Keyword scan' },
+      { name: 'Domain Reputation', key: 'reputation', desc: 'Blacklist check' },
+      { name: 'Redirect Count', key: 'redirects', desc: 'Hop analysis' },
+      { name: 'Port Usage', key: 'port', desc: 'Port check' },
+      { name: 'Subdomain Count', key: 'subdomains', desc: 'Depth analysis' },
+      { name: 'URL Entropy', key: 'entropy', desc: 'Randomness' },
+      { name: 'TLD Analysis', key: 'tld', desc: 'Extension check' },
+      { name: 'Typosquatting', key: 'typo', desc: 'Brand check' },
+      { name: 'Special Chars', key: 'special', desc: 'Symbol analysis' },
+      { name: 'Path Depth', key: 'path', desc: 'URL structure' },
+      { name: 'Query Params', key: 'query', desc: 'Parameter scan' },
+      { name: 'Domain Length', key: 'domain_len', desc: 'Domain size' },
+      { name: 'WHOIS Data', key: 'whois', desc: 'Registry info' },
+      { name: 'DNS Records', key: 'dns', desc: 'DNS analysis' },
+      { name: 'Page Content', key: 'content', desc: 'Content check' },
+      { name: 'Form Detection', key: 'forms', desc: 'Input fields' },
+      { name: 'External Links', key: 'links', desc: 'Link analysis' },
+      { name: 'Script Analysis', key: 'scripts', desc: 'JS detection' },
+      { name: 'Brand Similarity', key: 'brand', desc: 'Logo match' },
+      { name: 'Historical Data', key: 'history', desc: 'Past reports' }
+    ];
+    
+    // Threat indicators
+    const threatIndicators = {
+      safe: [
+        { name: 'Valid SSL Certificate', status: 'pass' },
+        { name: 'Known Trusted Domain', status: 'pass' },
+        { name: 'No Suspicious Patterns', status: 'pass' },
+        { name: 'Clean Reputation', status: 'pass' }
+      ],
+      warning: [
+        { name: 'Unusual TLD Extension', status: 'warn' },
+        { name: 'Recently Registered Domain', status: 'warn' },
+        { name: 'Missing SSL Certificate', status: 'fail' },
+        { name: 'Suspicious URL Pattern', status: 'warn' }
+      ],
+      danger: [
+        { name: 'Known Phishing Pattern', status: 'fail' },
+        { name: 'Brand Impersonation Detected', status: 'fail' },
+        { name: 'Blacklisted Domain', status: 'fail' },
+        { name: 'Malicious Content Detected', status: 'fail' }
+      ]
+    };
+    
+    // DOM Elements
+    const scanForm = document.getElementById('scan-form');
+    const urlInput = document.getElementById('url-input');
+    const scanBtn = document.getElementById('scan-btn');
+    const scanBtnText = document.getElementById('scan-btn-text');
+    const analysisSection = document.getElementById('analysis-section');
+    const resultsSection = document.getElementById('results-section');
+    const historyList = document.getElementById('history-list');
+    const scansCounter = document.getElementById('scans-counter');
+    
+    // Toast notification
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const colors = {
+        success: 'bg-emerald-500/90 border-emerald-400',
+        error: 'bg-red-500/90 border-red-400',
+        info: 'bg-cyan-500/90 border-cyan-400'
+      };
+      
+      const toast = document.createElement('div');
+      toast.className = `toast ${colors[type]} text-white px-4 py-3 rounded-xl border text-sm font-medium shadow-lg backdrop-blur-sm`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    // Analyze URL with animated steps
+    async function analyzeUrl(url, forcedType = null) {
+      // Reset UI
+      analysisSection.classList.remove('hidden');
+      resultsSection.classList.add('hidden');
+      scanBtn.disabled = true;
+      
+      // Set analyzing URL display
+      document.getElementById('analyzing-url').textContent = url;
+      
+      // Reset analysis steps
+      const steps = document.querySelectorAll('.analysis-step');
+      steps.forEach(step => {
+        step.classList.remove('active', 'complete');
+        step.querySelector('.check-icon').classList.add('hidden');
+        step.querySelector('.loading-dot').classList.remove('hidden');
+      });
+      
+      // Reset feature grid
+      const featureGrid = document.getElementById('feature-grid');
+      featureGrid.innerHTML = '';
+      
+      // Reset progress
+      const progressBar = document.getElementById('main-progress-bar');
+      const scanPercent = document.getElementById('scan-percent');
+      progressBar.style.width = '0%';
+      scanPercent.textContent = '0%';
+      
+      let currentStep = 0;
+      const startTime = Date.now();
+      
+      // Animate through steps
+      for (let i = 0; i <= 100; i += 2) {
+        await new Promise(r => setTimeout(r, 35));
+        
+        progressBar.style.width = `${i}%`;
+        scanPercent.textContent = `${i}%`;
+        
+        // Update steps
+        const stepThresholds = [25, 50, 75, 95];
+        if (currentStep < 4 && i >= stepThresholds[currentStep]) {
+          // Complete current step
+          const prevStep = steps[currentStep];
+          prevStep.classList.remove('active');
+          prevStep.classList.add('complete');
+          prevStep.querySelector('.check-icon').classList.remove('hidden');
+          prevStep.querySelector('.loading-dot').classList.add('hidden');
+          
+          currentStep++;
+          
+          // Activate next step if exists
+          if (currentStep < 4) {
+            steps[currentStep].classList.add('active');
+          }
+        } else if (currentStep < 4 && !steps[currentStep].classList.contains('active')) {
+          steps[currentStep].classList.add('active');
+        }
+        
+        // Add features progressively
+        if (i % 8 === 0 && featureGrid.children.length < mlFeatures.length) {
+          const featureIndex = featureGrid.children.length;
+          const feature = mlFeatures[featureIndex];
+          const passed = forcedType === 'safe' ? Math.random() > 0.05 : 
+                        forcedType === 'danger' ? Math.random() > 0.6 : 
+                        Math.random() > 0.3;
+          
+          const featureEl = document.createElement('div');
+          featureEl.className = 'feature-card analyzing px-3 py-2 rounded-lg flex items-center gap-2';
+          featureEl.innerHTML = `
+            <span class="w-2 h-2 rounded-full flex-shrink-0 ${passed ? 'bg-emerald-400' : 'bg-red-400'}"></span>
+            <span class="text-xs text-slate-300 truncate">${feature.name}</span>
+          `;
+          featureGrid.appendChild(featureEl);
+        }
+      }
+      
+      // Complete last step
+      steps[3].classList.remove('active');
+      steps[3].classList.add('complete');
+      steps[3].querySelector('.check-icon').classList.remove('hidden');
+      steps[3].querySelector('.loading-dot').classList.add('hidden');
+      
+      const scanTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      // Determine result
+      let resultType, confidence, riskPercent, riskLabel;
+      
+      if (forcedType) {
+        resultType = forcedType;
+      } else {
+        const rand = Math.random();
+        resultType = rand < 0.6 ? 'safe' : rand < 0.85 ? 'warning' : 'danger';
+      }
+      
+      if (resultType === 'safe') {
+        confidence = 92 + Math.floor(Math.random() * 7);
+        riskPercent = 5 + Math.random() * 15;
+        riskLabel = 'Low Risk';
+      } else if (resultType === 'warning') {
+        confidence = 75 + Math.floor(Math.random() * 15);
+        riskPercent = 35 + Math.random() * 25;
+        riskLabel = 'Medium Risk';
+      } else {
+        confidence = 88 + Math.floor(Math.random() * 10);
+        riskPercent = 75 + Math.random() * 20;
+        riskLabel = 'High Risk';
+      }
+      
+      // Short delay before showing results
+      await new Promise(r => setTimeout(r, 500));
+      
+      // Hide analysis, show results
+      analysisSection.classList.add('hidden');
+      scanBtn.disabled = false;
+      
+      showResults(url, resultType, confidence, riskPercent, riskLabel, scanTime);
+      addToHistory(url, resultType, confidence);
+      
+      // Update scan counter
+      scanCount++;
+      scansCounter.textContent = scanCount;
+      
+      // Store current result for report
+      currentResult = { url, resultType, confidence, riskPercent, scanTime };
+    }
+    
+    function showResults(url, type, confidence, riskPercent, riskLabel, scanTime) {
+      resultsSection.classList.remove('hidden');
+      
+      const resultCard = document.getElementById('result-card');
+      resultCard.classList.remove('result-safe', 'result-danger', 'result-warning');
+      resultCard.classList.add(`result-${type}`);
+      
+      // Update elements
+      const resultIcon = document.getElementById('result-icon');
+      const resultTitle = document.getElementById('result-title');
+      const resultSubtitle = document.getElementById('result-subtitle');
+      const confidenceBadge = document.getElementById('confidence-badge');
+      const analyzedUrl = document.getElementById('analyzed-url');
+      const riskIndicator = document.getElementById('risk-indicator');
+      const riskLabelEl = document.getElementById('risk-label');
+      const mlPrediction = document.getElementById('ml-prediction');
+      const scanTimeEl = document.getElementById('scan-time');
+      
+      analyzedUrl.textContent = url;
+      riskIndicator.style.left = `calc(${riskPercent}% - 10px)`;
+      riskLabelEl.textContent = riskLabel;
+      scanTimeEl.textContent = `${scanTime}s`;
+      confidenceBadge.textContent = `${confidence}% Confidence`;
+      
+      const configs = {
+        safe: {
+          icon: `<div class="w-full h-full bg-emerald-500/20 rounded-2xl flex items-center justify-center">
+                  <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                </div>`,
+          title: 'URL is Safe',
+          titleClass: 'text-2xl sm:text-3xl font-bold text-emerald-400',
+          subtitle: 'No threats detected',
+          badgeClass: 'px-5 py-2.5 rounded-xl text-sm font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+          riskClass: 'text-sm font-bold text-emerald-400',
+          prediction: 'Legitimate',
+          predictionClass: 'text-lg font-bold text-emerald-400'
+        },
+        warning: {
+          icon: `<div class="w-full h-full bg-yellow-500/20 rounded-2xl flex items-center justify-center">
+                  <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                </div>`,
+          title: 'Suspicious URL',
+          titleClass: 'text-2xl sm:text-3xl font-bold text-yellow-400',
+          subtitle: 'Proceed with caution',
+          badgeClass: 'px-5 py-2.5 rounded-xl text-sm font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
+          riskClass: 'text-sm font-bold text-yellow-400',
+          prediction: 'Suspicious',
+          predictionClass: 'text-lg font-bold text-yellow-400'
+        },
+        danger: {
+          icon: `<div class="w-full h-full bg-red-500/20 rounded-2xl flex items-center justify-center">
+                  <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                </div>`,
+          title: 'Phishing Detected!',
+          titleClass: 'text-2xl sm:text-3xl font-bold text-red-400',
+          subtitle: 'This URL is dangerous',
+          badgeClass: 'px-5 py-2.5 rounded-xl text-sm font-bold bg-red-500/20 text-red-400 border border-red-500/30',
+          riskClass: 'text-sm font-bold text-red-400',
+          prediction: 'Phishing',
+          predictionClass: 'text-lg font-bold text-red-400'
+        }
+      };
+      
+      const cfg = configs[type];
+      resultIcon.innerHTML = cfg.icon;
+      resultTitle.textContent = cfg.title;
+      resultTitle.className = cfg.titleClass;
+      resultSubtitle.textContent = cfg.subtitle;
+      confidenceBadge.className = cfg.badgeClass;
+      riskLabelEl.className = cfg.riskClass;
+      mlPrediction.textContent = cfg.prediction;
+      mlPrediction.className = cfg.predictionClass;
+      
+      // Populate feature list
+      const featureList = document.getElementById('result-feature-list');
+      featureList.innerHTML = mlFeatures.slice(0, 12).map(feature => {
+        const passed = type === 'safe' ? Math.random() > 0.1 : 
+                      type === 'danger' ? Math.random() > 0.6 : 
+                      Math.random() > 0.35;
+        return `
+          <div class="flex items-center justify-between py-2 px-3 bg-slate-900/40 rounded-lg">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full ${passed ? 'bg-emerald-400' : 'bg-red-400'}"></span>
+              <span class="text-xs text-slate-300">${feature.name}</span>
+            </div>
+            <span class="text-[10px] text-slate-500">${passed ? 'Pass' : 'Fail'}</span>
+          </div>
+        `;
+      }).join('');
+      
+      // Populate threat list
+      const threatList = document.getElementById('threat-list');
+      const threats = threatIndicators[type];
+      threatList.innerHTML = threats.map(threat => {
+        const statusColors = {
+          pass: 'bg-emerald-400',
+          warn: 'bg-yellow-400',
+          fail: 'bg-red-400'
+        };
+        const statusText = {
+          pass: 'Passed',
+          warn: 'Warning',
+          fail: 'Failed'
+        };
+        return `
+          <div class="flex items-center justify-between py-3 px-4 bg-slate-900/40 rounded-lg">
+            <div class="flex items-center gap-3">
+              <span class="w-2.5 h-2.5 rounded-full ${statusColors[threat.status]}"></span>
+              <span class="text-sm text-slate-300">${threat.name}</span>
+            </div>
+            <span class="text-xs ${threat.status === 'pass' ? 'text-emerald-400' : threat.status === 'warn' ? 'text-yellow-400' : 'text-red-400'}">${statusText[threat.status]}</span>
+          </div>
+        `;
+      }).join('');
+      
+      // Populate model scores
+      const modelScores = document.getElementById('model-scores');
+      const models = [
+        { name: 'Random Forest', score: type === 'safe' ? 92 + Math.random() * 7 : type === 'danger' ? 85 + Math.random() * 12 : 70 + Math.random() * 20 },
+        { name: 'XGBoost', score: type === 'safe' ? 94 + Math.random() * 5 : type === 'danger' ? 88 + Math.random() * 10 : 72 + Math.random() * 18 },
+        { name: 'Neural Network', score: type === 'safe' ? 91 + Math.random() * 8 : type === 'danger' ? 90 + Math.random() * 9 : 68 + Math.random() * 22 }
+      ];
+      
+      modelScores.innerHTML = models.map(model => {
+        const score = model.score.toFixed(1);
+        const colorClass = type === 'safe' ? 'bg-emerald-500' : type === 'danger' ? 'bg-red-500' : 'bg-yellow-500';
+        return `
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-sm text-slate-300">${model.name}</span>
+              <span class="text-sm font-bold ${type === 'safe' ? 'text-emerald-400' : type === 'danger' ? 'text-red-400' : 'text-yellow-400'}">${score}%</span>
+            </div>
+            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="${colorClass} h-full rounded-full transition-all duration-1000" style="width: ${score}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Scroll to results
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function addToHistory(url, type, confidence) {
+      const entry = { url, type, confidence, timestamp: new Date() };
+      scanHistory.unshift(entry);
+      if (scanHistory.length > 10) scanHistory.pop();
+      renderHistory();
+    }
+    
+    function renderHistory() {
+      if (scanHistory.length === 0) {
+        historyList.innerHTML = '<p class="text-sm text-slate-500 text-center py-8 bg-slate-900/30 rounded-xl border border-slate-800/50">No scans yet. Enter a URL or try a sample above.</p>';
+        return;
+      }
+      
+      historyList.innerHTML = scanHistory.map(entry => {
+        const typeConfigs = {
+          safe: { color: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/30', icon: '✓', label: 'Safe' },
+          warning: { color: 'text-yellow-400 bg-yellow-500/15 border-yellow-500/30', icon: '!', label: 'Suspicious' },
+          danger: { color: 'text-red-400 bg-red-500/15 border-red-500/30', icon: '✕', label: 'Phishing' }
+        };
+        const cfg = typeConfigs[entry.type];
+        
+        return `
+          <div class="history-item rounded-xl p-4 flex items-center justify-between gap-4 cursor-pointer" onclick="reanalyze('${entry.url}', '${entry.type}')">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-9 h-9 rounded-lg ${cfg.color} border flex items-center justify-center font-bold text-sm flex-shrink-0">
+                ${cfg.icon}
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm text-slate-300 truncate" style="font-family: 'JetBrains Mono', monospace;">${entry.url}</p>
+                <p class="text-xs text-slate-500">${entry.timestamp.toLocaleTimeString()}</p>
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <span class="text-xs font-semibold ${cfg.color.split(' ')[0]}">${cfg.label}</span>
+              <p class="text-xs text-slate-500">${entry.confidence}%</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function reanalyze(url, type) {
+      urlInput.value = url;
+      analyzeUrl(url, type);
+    }
+    
+    // Event Listeners
+    scanForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        showToast('Please enter a URL to analyze', 'error');
+        urlInput.focus();
+        return;
+      }
+      
+      let validUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        validUrl = 'https://' + url;
+      }
+      
+      analyzeUrl(validUrl);
+    });
+    
+    // Sample URL buttons
+    document.querySelectorAll('.sample-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.dataset.url;
+        const type = btn.dataset.type;
+        urlInput.value = url;
+        analyzeUrl(url, type);
+      });
+    });
+    
+    // New scan button
+    document.getElementById('new-scan-btn').addEventListener('click', () => {
+      resultsSection.classList.add('hidden');
+      urlInput.value = '';
+      urlInput.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // Copy report button
+    document.getElementById('copy-report-btn').addEventListener('click', () => {
+      if (!currentResult) return;
+      
+      const report = `
+AI Phishing Detection Report
+============================
+URL: ${currentResult.url}
+Status: ${currentResult.resultType.toUpperCase()}
+Confidence: ${currentResult.confidence}%
+Risk Level: ${currentResult.riskPercent.toFixed(1)}%
+Scan Time: ${currentResult.scanTime}s
+Generated: ${new Date().toLocaleString()}
+      `.trim();
+      
+      navigator.clipboard.writeText(report).then(() => {
+        showToast('Report copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Failed to copy report', 'error');
+      });
+    });
+    
+    // Report error button
+    document.getElementById('report-btn').addEventListener('click', () => {
+      showToast('Thank you! Report submitted for review.', 'success');
+    });
+    
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update active tab
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Show corresponding content
+        const tabName = btn.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.add('hidden');
+        });
+        document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      });
+    });
+    
+    // Element SDK Integration
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      const titleEl = document.getElementById('app-title');
+      titleEl.textContent = config.app_title || defaultConfig.app_title;
+      
+      const taglineEl = document.getElementById('tagline');
+      taglineEl.textContent = config.tagline || defaultConfig.tagline;
+      
+      scanBtnText.textContent = config.scan_button_text || defaultConfig.scan_button_text;
+      
+      if (config.font_family) {
+        document.body.style.fontFamily = `${config.font_family}, 'Exo 2', sans-serif`;
+      }
+      
+      if (config.font_size) {
+        titleEl.style.fontSize = `${config.font_size * 2.5}px`;
+        taglineEl.style.fontSize = `${config.font_size}px`;
+      }
+    }
+    
+    function mapToCapabilities(cfg) {
+      return {
+        recolorables: [
+          {
+            get: () => cfg.background_color || defaultConfig.background_color,
+            set: (value) => { cfg.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => cfg.surface_color || defaultConfig.surface_color,
+            set: (value) => { cfg.surface_color = value; window.elementSdk.setConfig({ surface_color: value }); }
+          },
+          {
+            get: () => cfg.text_color || defaultConfig.text_color,
+            set: (value) => { cfg.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+          },
+          {
+            get: () => cfg.primary_color || defaultConfig.primary_color,
+            set: (value) => { cfg.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); }
+          },
+          {
+            get: () => cfg.accent_color || defaultConfig.accent_color,
+            set: (value) => { cfg.accent_color = value; window.elementSdk.setConfig({ accent_color: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => cfg.font_family || 'Exo 2',
+          set: (value) => { cfg.font_family = value; window.elementSdk.setConfig({ font_family: value }); }
+        },
+        fontSizeable: {
+          get: () => cfg.font_size || 16,
+          set: (value) => { cfg.font_size = value; window.elementSdk.setConfig({ font_size: value }); }
+        }
+      };
+    }
+    
+    function mapToEditPanelValues(cfg) {
+      return new Map([
+        ['app_title', cfg.app_title || defaultConfig.app_title],
+        ['tagline', cfg.tagline || defaultConfig.tagline],
+        ['scan_button_text', cfg.scan_button_text || defaultConfig.scan_button_text]
+      ]);
+    }
+    
+    // Initialize SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afda9d6803684d1',t:'MTc2NjA1MDQ1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

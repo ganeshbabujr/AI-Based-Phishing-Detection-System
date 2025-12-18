@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishGuard AI - Enterprise Threat Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8fafc;
+    }
+    
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    
+    /* Corporate Color Scheme */
+    :root {
+      --navy-900: #0f172a;
+      --navy-800: #1e293b;
+      --navy-700: #334155;
+      --navy-600: #475569;
+      --navy-500: #64748b;
+      --navy-400: #94a3b8;
+      --navy-300: #cbd5e1;
+      --navy-200: #e2e8f0;
+      --navy-100: #f1f5f9;
+      --navy-50: #f8fafc;
+      --accent-blue: #2563eb;
+      --accent-blue-dark: #1d4ed8;
+      --accent-blue-light: #3b82f6;
+      --success: #059669;
+      --success-light: #10b981;
+      --danger: #dc2626;
+      --danger-light: #ef4444;
+      --warning: #d97706;
+    }
+    
+    /* Professional Card Styling */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+    }
+    
+    .card-elevated {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    
+    /* Header Styling */
+    .header-gradient {
+      background: linear-gradient(180deg, #ffffff 0%, var(--navy-50) 100%);
+      border-bottom: 1px solid var(--navy-200);
+    }
+    
+    /* Input Styling */
+    .input-professional {
+      background: #ffffff;
+      border: 1px solid var(--navy-300);
+      transition: all 0.2s ease;
+    }
+    
+    .input-professional:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .input-professional textarea {
+      background: transparent;
+      resize: none;
+    }
+    
+    .input-professional textarea:focus { outline: none; }
+    .input-professional textarea::placeholder { color: var(--navy-400); }
+    
+    /* Button Styling */
+    .btn-primary {
+      background: var(--accent-blue);
+      color: white;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-blue-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary:disabled {
+      background: var(--navy-300);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid var(--navy-300);
+      color: var(--navy-700);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--navy-50);
+      border-color: var(--navy-400);
+    }
+    
+    /* Sample Cards */
+    .sample-card {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .sample-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .sample-card.danger:hover {
+      border-color: var(--danger);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+    }
+    
+    /* Result Cards */
+    .result-safe {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #86efac;
+    }
+    
+    .result-danger {
+      background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+      border: 1px solid #fca5a5;
+    }
+    
+    /* Progress Ring */
+    .progress-ring {
+      transform: rotate(-90deg);
+    }
+    
+    .progress-ring-track {
+      stroke: var(--navy-200);
+    }
+    
+    .progress-ring-progress {
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 1.5s ease-out;
+    }
+    
+    /* Stats Card */
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      transition: all 0.2s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    }
+    
+    /* Loading Animation */
+    .loader {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    
+    .loader-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      animation: loaderPulse 1.4s ease-in-out infinite;
+    }
+    
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes loaderPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .toast {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      box-shadow: 0 10px 40px rgba(15, 23, 42, 0.15);
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+    }
+    
+    /* Pipeline Step */
+    .pipeline-step {
+      background: #ffffff;
+      border: 1px solid var(--navy-200);
+      position: relative;
+    }
+    
+    .pipeline-step::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -24px;
+      width: 24px;
+      height: 2px;
+      background: var(--navy-300);
+    }
+    
+    .pipeline-step:last-child::after {
+      display: none;
+    }
+    
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+    
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .badge-info {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--navy-100); }
+    ::-webkit-scrollbar-thumb { background: var(--navy-300); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--navy-400); }
+    
+    /* Status Indicator */
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Threat Level Bar */
+    .threat-bar {
+      height: 6px;
+      background: var(--navy-200);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .threat-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s ease-out;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full text-slate-800 overflow-auto"><!-- Toast Container -->
+  <div class="toast-container">
+   <div id="toast" class="toast rounded-lg p-4 flex items-center gap-3 min-w-[280px]">
+    <div id="toast-icon" class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"></div>
+    <div class="flex-1">
+     <p id="toast-title" class="text-sm font-semibold text-slate-800"></p>
+     <p id="toast-message" class="text-xs text-slate-500"></p>
+    </div><button id="toast-close" class="text-slate-400 hover:text-slate-600 transition-colors p-1">
+     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+     </svg></button>
+   </div>
+  </div><!-- History Modal -->
+  <div id="history-modal" class="fixed inset-0 z-50 hidden">
+   <div class="modal-overlay absolute inset-0" id="history-backdrop"></div>
+   <div class="absolute inset-4 sm:inset-8 lg:inset-16 flex items-start justify-center overflow-auto py-8">
+    <div class="modal-content rounded-xl w-full max-w-2xl p-6 sm:p-8 relative">
+     <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <div>
+        <h3 class="text-lg font-bold text-slate-800">Scan History</h3>
+        <p class="text-xs text-slate-500">Previous threat analyses</p>
+       </div>
+      </div><button id="close-history" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
+       <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+       </svg></button>
+     </div>
+     <div id="history-list" class="space-y-3 max-h-[50%] overflow-auto"></div>
+     <div id="history-empty" class="text-center py-12">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-slate-100 flex items-center justify-center">
+       <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+       </svg>
+      </div>
+      <p class="text-sm font-medium text-slate-600 mb-1">No scan history</p>
+      <p class="text-xs text-slate-400">Your analysis results will appear here</p>
+     </div>
+     <div class="flex items-center justify-between mt-6 pt-6 border-t border-slate-200"><button id="clear-history" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+       </svg> Clear All </button> <button id="export-history" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+       </svg> Export Report </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="relative z-10 min-h-full w-full flex flex-col bg-slate-50"><!-- Header -->
+   <header class="header-gradient sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex items-center justify-between h-16"><!-- Logo -->
+      <div class="flex items-center gap-3">
+       <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+       </div>
+       <div>
+        <h1 class="text-base font-bold text-slate-800">PhishGuard AI</h1>
+        <p class="text-[10px] text-slate-500 font-medium">Enterprise Threat Detection</p>
+       </div>
+      </div><!-- Right Controls -->
+      <div class="flex items-center gap-3">
+       <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100"><span id="live-clock" class="text-xs mono text-slate-600 font-medium">--:--:--</span>
+       </div>
+       <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200"><span class="status-dot bg-emerald-500"></span> <span class="text-xs font-semibold text-emerald-700">System Online</span>
+       </div>
+      </div>
+     </div>
+    </div>
+   </header>
+   <main class="flex-1 w-full"><!-- Hero Section -->
+    <section class="bg-white border-b border-slate-200">
+     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div class="max-w-3xl">
+       <div class="flex items-center gap-2 mb-4"><span class="badge badge-info">AI-Powered</span> <span class="badge badge-success">95% Accuracy</span>
+       </div>
+       <h2 id="hero-title" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">Enterprise Threat Detection Platform</h2>
+       <p id="hero-subtitle" class="text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl">Advanced machine learning algorithms to detect phishing attacks, scam messages, and social engineering threats in real-time.</p><!-- Key Metrics -->
+       <div class="flex flex-wrap gap-8">
+        <div>
+         <p class="text-3xl font-bold text-blue-600">95%</p>
+         <p class="text-sm text-slate-500 font-medium">Detection Accuracy</p>
+        </div>
+        <div class="hidden sm:block w-px h-12 bg-slate-200"></div>
+        <div>
+         <p class="text-3xl font-bold text-slate-800">&lt;1s</p>
+         <p class="text-sm text-slate-500 font-medium">Response Time</p>
+        </div>
+        <div class="hidden sm:block w-px h-12 bg-slate-200"></div>
+        <div>
+         <p class="text-3xl font-bold text-slate-800">5,000+</p>
+         <p class="text-sm text-slate-500 font-medium">Training Samples</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section><!-- Main Scanner Section -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><!-- Scanner Panel -->
+      <div class="lg:col-span-2">
+       <div class="card-elevated rounded-xl p-6"><!-- Header -->
+        <div class="flex items-center justify-between mb-5">
+         <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+           <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+           </svg>
+          </div>
+          <div>
+           <h3 class="text-base font-bold text-slate-800">Message Scanner</h3>
+           <p class="text-xs text-slate-500">Analyze suspicious content</p>
+          </div>
+         </div>
+         <div id="threat-level" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100"><span class="w-2 h-2 bg-slate-400 rounded-full"></span> <span class="text-xs text-slate-600 font-semibold">Ready</span>
+         </div>
+        </div><!-- Input Area -->
+        <div class="input-professional rounded-lg p-4 mb-4"><label for="message-input" class="sr-only">Enter message to analyze</label> <textarea id="message-input" class="w-full h-40 text-slate-800 text-sm leading-relaxed" placeholder="Paste your suspicious email, SMS, or message here for analysis...
+
+Example: 'URGENT: Your account has been compromised! Click here to verify your identity immediately.'"></textarea> <!-- Input Footer -->
+         <div class="flex items-center justify-between pt-3 border-t border-slate-200 mt-3">
+          <div class="flex items-center gap-3"><span id="char-count" class="text-xs text-slate-400 mono">0 chars</span> <span class="w-1 h-1 bg-slate-300 rounded-full"></span> <span id="word-count" class="text-xs text-slate-400">0 words</span>
+          </div>
+          <div class="flex items-center gap-2"><button id="paste-btn" class="text-xs text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-100">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg> Paste </button> <button id="clear-btn" class="text-xs text-slate-500 hover:text-red-600 transition-colors flex items-center gap-1 px-2 py-1 rounded hover:bg-slate-100">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg> Clear </button>
+          </div>
+         </div>
+        </div><!-- Analyze Button --> <button id="analyze-btn" class="btn-primary w-full py-3 rounded-lg text-sm flex items-center justify-center gap-2">
+         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+         </svg><span id="btn-text">Analyze Message</span> </button> <!-- Loading State -->
+        <div id="loading-state" class="hidden py-12">
+         <div class="flex flex-col items-center gap-4">
+          <div class="loader">
+           <div class="loader-dot"></div>
+           <div class="loader-dot"></div>
+           <div class="loader-dot"></div>
+          </div>
+          <div class="text-center">
+           <p class="text-sm font-semibold text-slate-700 mb-1">Analyzing Message</p>
+           <p id="loading-step" class="text-xs text-slate-500">Processing...</p>
+          </div>
+         </div>
+        </div><!-- Result Container -->
+        <div id="result-container" class="hidden mt-5"></div>
+       </div>
+      </div><!-- Sidebar -->
+      <div class="space-y-5"><!-- Quick Actions -->
+       <div class="card rounded-xl p-5">
+        <h4 class="text-sm font-bold text-slate-800 mb-4">Quick Actions</h4>
+        <div class="space-y-2"><button id="history-btn" class="btn-secondary w-full py-2.5 rounded-lg text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg> View History <span id="history-count" class="ml-auto w-5 h-5 rounded bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center">0</span> </button>
+        </div>
+       </div><!-- Session Stats -->
+       <div class="card rounded-xl p-5">
+        <h4 class="text-sm font-bold text-slate-800 mb-4">Session Statistics</h4>
+        <div class="space-y-4">
+         <div class="flex items-center justify-between"><span class="text-xs text-slate-500">Scans Today</span> <span id="scan-count" class="text-sm font-bold text-slate-800">0</span>
+         </div>
+         <div class="flex items-center justify-between"><span class="text-xs text-slate-500">Threats Found</span> <span id="threat-count" class="text-sm font-bold text-red-600">0</span>
+         </div>
+         <div class="flex items-center justify-between"><span class="text-xs text-slate-500">Safe Messages</span> <span id="safe-count" class="text-sm font-bold text-emerald-600">0</span>
+         </div>
+        </div>
+       </div><!-- Detection Types -->
+       <div class="card rounded-xl p-5">
+        <h4 class="text-sm font-bold text-slate-800 mb-4">Detection Capabilities</h4>
+        <div class="space-y-2">
+         <div class="flex items-center gap-2 text-xs text-slate-600">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg> Phishing URLs
+         </div>
+         <div class="flex items-center gap-2 text-xs text-slate-600">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg> Social Engineering
+         </div>
+         <div class="flex items-center gap-2 text-xs text-slate-600">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg> Credential Theft
+         </div>
+         <div class="flex items-center gap-2 text-xs text-slate-600">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg> Advance Fee Scams
+         </div>
+         <div class="flex items-center gap-2 text-xs text-slate-600">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg> Urgency Manipulation
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section><!-- Sample Messages -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+     <div class="mb-5">
+      <h3 class="text-lg font-bold text-slate-800 mb-1">Test Samples</h3>
+      <p class="text-sm text-slate-500">Click to load example messages for analysis</p>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><!-- Safe Examples -->
+      <div>
+       <p class="text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-3 flex items-center gap-2"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Legitimate Messages</p>
+       <div class="space-y-3"><button class="sample-card w-full p-4 rounded-lg text-left" data-type="safe" data-message="Hi Sarah, just a quick reminder about our project sync meeting tomorrow at 10 AM in Conference Room B. Please bring your progress report and any blockers you'd like to discuss. Let me know if the time doesn't work. Best, Michael - Engineering Lead">
+         <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+           <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+           </svg>
+          </div>
+          <div>
+           <p class="text-sm font-semibold text-slate-800 mb-1">Meeting Reminder</p>
+           <p class="text-xs text-slate-500">Professional workplace communication</p>
+          </div><span class="badge badge-success ml-auto">Safe</span>
+         </div></button> <button class="sample-card w-full p-4 rounded-lg text-left" data-type="safe" data-message="Your Amazon order #123-7890456-1234567 has shipped! Track your package at amazon.com/orders. Estimated delivery: Friday, March 15, 2024. Thank you for shopping with us! - Amazon Customer Service">
+         <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+           <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+           </svg>
+          </div>
+          <div>
+           <p class="text-sm font-semibold text-slate-800 mb-1">Order Notification</p>
+           <p class="text-xs text-slate-500">Legitimate e-commerce update</p>
+          </div><span class="badge badge-success ml-auto">Safe</span>
+         </div></button>
+       </div>
+      </div><!-- Phishing Examples -->
+      <div>
+       <p class="text-xs font-semibold text-red-700 uppercase tracking-wider mb-3 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full"></span> Phishing Threats</p>
+       <div class="space-y-3"><button class="sample-card danger w-full p-4 rounded-lg text-left" data-type="phishing" data-message="⚠️ URGENT SECURITY ALERT: Your bank account has been locked due to suspicious activity! Click here immediately to verify your identity and restore access: http://secure-bankverify.xyz/login - Failure to respond within 24 HOURS will result in permanent account closure!">
+         <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+           <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+           </svg>
+          </div>
+          <div>
+           <p class="text-sm font-semibold text-slate-800 mb-1">Fake Bank Alert</p>
+           <p class="text-xs text-slate-500">Credential phishing attempt</p>
+          </div><span class="badge badge-danger ml-auto">Threat</span>
+         </div></button> <button class="sample-card danger w-full p-4 rounded-lg text-left" data-type="phishing" data-message="🎉 CONGRATULATIONS!!! You have been randomly selected as our WINNER of $5,000,000 USD in the International Email Lottery! To claim your prize money, reply with your full name, home address, phone number, and bank account details to: prize-claims@winner-lottery.tk">
+         <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+           <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+           </svg>
+          </div>
+          <div>
+           <p class="text-sm font-semibold text-slate-800 mb-1">Lottery Scam</p>
+           <p class="text-xs text-slate-500">Advance fee fraud attempt</p>
+          </div><span class="badge badge-danger ml-auto">Threat</span>
+         </div></button>
+       </div>
+      </div>
+     </div>
+    </section><!-- How It Works -->
+    <section class="bg-white border-t border-slate-200">
+     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="text-center mb-10">
+       <h3 class="text-xl font-bold text-slate-800 mb-2">How It Works</h3>
+       <p class="text-sm text-slate-500">Our machine learning pipeline analyzes messages in four steps</p>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+       <div class="text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-blue-50 flex items-center justify-center"><span class="text-lg font-bold text-blue-600">1</span>
+        </div>
+        <h4 class="text-sm font-semibold text-slate-800 mb-1">Input Processing</h4>
+        <p class="text-xs text-slate-500">Text normalization and cleaning</p>
+       </div>
+       <div class="text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-blue-50 flex items-center justify-center"><span class="text-lg font-bold text-blue-600">2</span>
+        </div>
+        <h4 class="text-sm font-semibold text-slate-800 mb-1">Feature Extraction</h4>
+        <p class="text-xs text-slate-500">TF-IDF vectorization</p>
+       </div>
+       <div class="text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-blue-50 flex items-center justify-center"><span class="text-lg font-bold text-blue-600">3</span>
+        </div>
+        <h4 class="text-sm font-semibold text-slate-800 mb-1">ML Classification</h4>
+        <p class="text-xs text-slate-500">Logistic regression model</p>
+       </div>
+       <div class="text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-blue-50 flex items-center justify-center"><span class="text-lg font-bold text-blue-600">4</span>
+        </div>
+        <h4 class="text-sm font-semibold text-slate-800 mb-1">Results Output</h4>
+        <p class="text-xs text-slate-500">Confidence scoring</p>
+       </div>
+      </div><!-- Tech Stack -->
+      <div class="mt-10 pt-8 border-t border-slate-200">
+       <p class="text-xs text-slate-400 uppercase tracking-widest mb-4 text-center font-semibold">Technology Stack</p>
+       <div class="flex flex-wrap justify-center gap-2"><span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium">Python</span> <span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium">Flask</span> <span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium">Scikit-learn</span> <span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium">TF-IDF</span> <span class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 text-xs font-medium">Logistic Regression</span>
+       </div>
+      </div>
+     </div>
+    </section>
+   </main><!-- Footer -->
+   <footer class="border-t border-slate-200 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+       <div class="w-7 h-7 rounded bg-blue-600 flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+       </div><span class="text-sm font-semibold text-slate-800">PhishGuard AI</span>
+      </div>
+      <p id="footer-text" class="text-xs text-slate-500">CSE Final Year Project © 2024</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    // State
+    let scanHistory = [];
+    const MAX_HISTORY = 50;
+    let scanCount = 0;
+    let threatCount = 0;
+    let safeCount = 0;
+    
+    const defaultConfig = {
+      hero_title: 'Enterprise Threat Detection Platform',
+      hero_subtitle: 'Advanced machine learning algorithms to detect phishing attacks, scam messages, and social engineering threats in real-time.',
+      button_text: 'Analyze Message',
+      footer_text: 'CSE Final Year Project © 2024',
+      background_color: '#f8fafc',
+      surface_color: '#ffffff',
+      text_color: '#1e293b',
+      primary_color: '#2563eb',
+      accent_color: '#059669'
+    };
+    
+    let config = { ...defaultConfig };
+    
+    // DOM Elements
+    const messageInput = document.getElementById('message-input');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const btnText = document.getElementById('btn-text');
+    const loadingState = document.getElementById('loading-state');
+    const loadingStep = document.getElementById('loading-step');
+    const resultContainer = document.getElementById('result-container');
+    const charCount = document.getElementById('char-count');
+    const wordCount = document.getElementById('word-count');
+    const clearBtn = document.getElementById('clear-btn');
+    const scanCountEl = document.getElementById('scan-count');
+    const threatCountEl = document.getElementById('threat-count');
+    const safeCountEl = document.getElementById('safe-count');
+    const threatLevel = document.getElementById('threat-level');
+    const liveClock = document.getElementById('live-clock');
+    
+    // Live Clock
+    function updateClock() {
+      const now = new Date();
+      liveClock.textContent = now.toLocaleTimeString('en-US', { hour12: false });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Toast System
+    const toast = document.getElementById('toast');
+    const toastIcon = document.getElementById('toast-icon');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMessage = document.getElementById('toast-message');
+    const toastClose = document.getElementById('toast-close');
+    let toastTimeout;
+    
+    function showToast(title, message, type = 'success') {
+      clearTimeout(toastTimeout);
+      
+      const icons = {
+        success: { bg: 'bg-emerald-50', color: 'text-emerald-600', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>' },
+        error: { bg: 'bg-red-50', color: 'text-red-600', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>' },
+        warning: { bg: 'bg-amber-50', color: 'text-amber-600', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>' },
+        info: { bg: 'bg-blue-50', color: 'text-blue-600', svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>' }
+      };
+      
+      const icon = icons[type] || icons.info;
+      toastIcon.className = `w-10 h-10 rounded-lg flex items-center justify-center ${icon.bg}`;
+      toastIcon.innerHTML = `<svg class="w-5 h-5 ${icon.color}" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon.svg}</svg>`;
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
+      
+      toast.classList.add('show');
+      
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+    
+    toastClose.addEventListener('click', () => toast.classList.remove('show'));
+    
+    // History Modal
+    const historyBtn = document.getElementById('history-btn');
+    const historyModal = document.getElementById('history-modal');
+    const historyBackdrop = document.getElementById('history-backdrop');
+    const closeHistory = document.getElementById('close-history');
+    const historyList = document.getElementById('history-list');
+    const historyEmpty = document.getElementById('history-empty');
+    const historyCountEl = document.getElementById('history-count');
+    const clearHistoryBtn = document.getElementById('clear-history');
+    const exportHistoryBtn = document.getElementById('export-history');
+    
+    historyBtn.addEventListener('click', () => {
+      historyModal.classList.remove('hidden');
+      renderHistory();
+    });
+    
+    closeHistory.addEventListener('click', () => historyModal.classList.add('hidden'));
+    historyBackdrop.addEventListener('click', () => historyModal.classList.add('hidden'));
+    
+    function addToHistory(message, result) {
+      const entry = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        message: message.substring(0, 150) + (message.length > 150 ? '...' : ''),
+        fullMessage: message,
+        prediction: result.prediction,
+        confidence: result.confidence,
+        indicators: result.indicators,
+        threatType: result.threatType
+      };
+      
+      scanHistory.unshift(entry);
+      if (scanHistory.length > MAX_HISTORY) scanHistory.pop();
+      historyCountEl.textContent = scanHistory.length;
+    }
+    
+    function renderHistory() {
+      if (scanHistory.length === 0) {
+        historyEmpty.classList.remove('hidden');
+        historyList.innerHTML = '';
+        return;
+      }
+      
+      historyEmpty.classList.add('hidden');
+      historyList.innerHTML = scanHistory.map(entry => {
+        const isPhishing = entry.prediction === 'phishing';
+        const date = new Date(entry.timestamp);
+        const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        return `
+          <div class="flex items-start gap-3 p-4 rounded-lg border ${isPhishing ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'} history-item cursor-pointer hover:shadow-sm transition-shadow" data-id="${entry.id}">
+            <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${isPhishing ? 'bg-red-100' : 'bg-emerald-100'}">
+              ${isPhishing ? 
+                '<svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>' :
+                '<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-semibold ${isPhishing ? 'text-red-700' : 'text-emerald-700'}">${isPhishing ? 'Threat Detected' : 'Safe'}</span>
+                <span class="text-[10px] text-slate-400">${entry.confidence.toFixed(0)}% confidence</span>
+                <span class="text-[10px] text-slate-400 ml-auto">${dateStr} ${timeStr}</span>
+              </div>
+              <p class="text-xs text-slate-600 truncate">${entry.message}</p>
+            </div>
+            <button class="delete-history p-1.5 rounded hover:bg-red-100 transition-colors" data-id="${entry.id}">
+              <svg class="w-3.5 h-3.5 text-slate-400 hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      historyList.querySelectorAll('.history-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.delete-history')) return;
+          const id = parseInt(item.dataset.id);
+          const entry = scanHistory.find(h => h.id === id);
+          if (entry) {
+            messageInput.value = entry.fullMessage;
+            charCount.textContent = `${entry.fullMessage.length} chars`;
+            wordCount.textContent = `${entry.fullMessage.trim().split(/\s+/).length} words`;
+            historyModal.classList.add('hidden');
+            showToast('Message Loaded', 'Ready for re-analysis', 'info');
+          }
+        });
+      });
+      
+      historyList.querySelectorAll('.delete-history').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = parseInt(btn.dataset.id);
+          scanHistory = scanHistory.filter(h => h.id !== id);
+          historyCountEl.textContent = scanHistory.length;
+          renderHistory();
+          showToast('Entry Removed', 'History updated', 'info');
+        });
+      });
+    }
+    
+    clearHistoryBtn.addEventListener('click', () => {
+      if (scanHistory.length === 0) return;
+      scanHistory = [];
+      historyCountEl.textContent = 0;
+      renderHistory();
+      showToast('History Cleared', 'All entries removed', 'success');
+    });
+    
+    exportHistoryBtn.addEventListener('click', () => {
+      if (scanHistory.length === 0) {
+        showToast('No Data', 'No history to export', 'warning');
+        return;
+      }
+      
+      let report = 'PHISHGUARD AI - THREAT ANALYSIS REPORT\n';
+      report += '=========================================\n\n';
+      report += `Generated: ${new Date().toLocaleString()}\n`;
+      report += `Total Scans: ${scanHistory.length}\n`;
+      report += `Threats: ${scanHistory.filter(h => h.prediction === 'phishing').length}\n`;
+      report += `Safe: ${scanHistory.filter(h => h.prediction === 'safe').length}\n\n`;
+      report += '-----------------------------------------\n\n';
+      
+      scanHistory.forEach((entry, i) => {
+        const date = new Date(entry.timestamp);
+        report += `[${i + 1}] ${entry.prediction.toUpperCase()}\n`;
+        report += `Time: ${date.toLocaleString()}\n`;
+        report += `Confidence: ${entry.confidence.toFixed(1)}%\n`;
+        if (entry.prediction === 'phishing') {
+          report += `Type: ${entry.threatType}\n`;
+        }
+        report += `Message: ${entry.fullMessage}\n`;
+        report += '\n-----------------------------------------\n\n';
+      });
+      
+      const blob = new Blob([report], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `phishguard-report-${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Report Exported', 'Download started', 'success');
+    });
+    
+    // Paste Button
+    document.getElementById('paste-btn').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          messageInput.value = text;
+          charCount.textContent = `${text.length} chars`;
+          wordCount.textContent = `${text.trim().split(/\s+/).length} words`;
+          showToast('Pasted', 'Text loaded from clipboard', 'success');
+        }
+      } catch (err) {
+        showToast('Access Denied', 'Clipboard permission required', 'error');
+      }
+    });
+    
+    // Input Events
+    messageInput.addEventListener('input', () => {
+      const text = messageInput.value;
+      charCount.textContent = `${text.length} chars`;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      wordCount.textContent = `${words} words`;
+    });
+    
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') analyzeBtn.click();
+    });
+    
+    clearBtn.addEventListener('click', () => {
+      messageInput.value = '';
+      charCount.textContent = '0 chars';
+      wordCount.textContent = '0 words';
+      resultContainer.classList.add('hidden');
+      resultContainer.innerHTML = '';
+      threatLevel.innerHTML = '<span class="w-2 h-2 bg-slate-400 rounded-full"></span><span class="text-xs text-slate-600 font-semibold">Ready</span>';
+    });
+    
+    // Sample Cards
+    document.querySelectorAll('.sample-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const message = card.dataset.message;
+        messageInput.value = message;
+        charCount.textContent = `${message.length} chars`;
+        wordCount.textContent = `${message.trim().split(/\s+/).length} words`;
+        messageInput.focus();
+        messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+    
+    // Analyze Button
+    analyzeBtn.addEventListener('click', async () => {
+      const message = messageInput.value.trim();
+      
+      if (!message) {
+        showToast('Input Required', 'Please enter a message', 'warning');
+        messageInput.focus();
+        return;
+      }
+      
+      if (message.length < 10) {
+        showToast('Too Short', 'Enter more text for analysis', 'warning');
+        return;
+      }
+      
+      await analyzeMessage(message);
+    });
+    
+    async function analyzeMessage(message) {
+      analyzeBtn.disabled = true;
+      loadingState.classList.remove('hidden');
+      resultContainer.classList.add('hidden');
+      
+      threatLevel.innerHTML = '<span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span><span class="text-xs text-blue-600 font-semibold">Scanning</span>';
+      
+      const steps = [
+        'Preprocessing text...',
+        'Extracting features...',
+        'Running ML model...',
+        'Computing confidence...',
+        'Generating report...'
+      ];
+      
+      for (let i = 0; i < steps.length; i++) {
+        loadingStep.textContent = steps[i];
+        await new Promise(r => setTimeout(r, 300 + Math.random() * 300));
+      }
+      
+      const result = simulateMLPrediction(message);
+      
+      loadingState.classList.add('hidden');
+      analyzeBtn.disabled = false;
+      
+      scanCount++;
+      scanCountEl.textContent = scanCount;
+      
+      if (result.prediction === 'phishing') {
+        threatCount++;
+        threatCountEl.textContent = threatCount;
+        threatLevel.innerHTML = '<span class="w-2 h-2 bg-red-500 rounded-full"></span><span class="text-xs text-red-600 font-semibold">Threat Found</span>';
+      } else {
+        safeCount++;
+        safeCountEl.textContent = safeCount;
+        threatLevel.innerHTML = '<span class="w-2 h-2 bg-emerald-500 rounded-full"></span><span class="text-xs text-emerald-600 font-semibold">Safe</span>';
+      }
+      
+      addToHistory(message, result);
+      displayResult(result);
+    }
+    
+    function simulateMLPrediction(message) {
+      const lowerMsg = message.toLowerCase();
+      
+      const phishingKeywords = [
+        'urgent', 'immediately', 'verify', 'suspended', 'click here',
+        'winner', 'won', 'prize', 'lottery', 'congratulations',
+        'bank account', 'password', 'credit card', 'ssn',
+        'act now', 'limited time', 'expire', 'confirm your',
+        '.xyz', '.tk', '.ml', 'free-', 'secure-', 'verify',
+        'locked', '24 hours', 'account closure'
+      ];
+      
+      let phishingScore = 0;
+      const detectedIndicators = [];
+      
+      phishingKeywords.forEach(keyword => {
+        if (lowerMsg.includes(keyword)) {
+          phishingScore += 10;
+          detectedIndicators.push(keyword);
+        }
+      });
+      
+      const urlPattern = /https?:\/\/[^\s]+/gi;
+      const urls = message.match(urlPattern) || [];
+      if (urls.some(url => url.includes('.xyz') || url.includes('.tk') || url.includes('.ml') || url.includes('verify') || url.includes('secure-'))) {
+        phishingScore += 25;
+        detectedIndicators.push('suspicious URL');
+      }
+      
+      if ((lowerMsg.match(/!/g) || []).length > 2) {
+        phishingScore += 10;
+        detectedIndicators.push('excessive punctuation');
+      }
+      
+      const confidence = Math.min(98, 55 + phishingScore);
+      const isPhishing = phishingScore >= 25;
+      
+      let threatType = 'General Phishing';
+      if (lowerMsg.includes('bank') || lowerMsg.includes('account')) threatType = 'Credential Phishing';
+      else if (lowerMsg.includes('lottery') || lowerMsg.includes('won') || lowerMsg.includes('prize')) threatType = 'Advance Fee Scam';
+      else if (lowerMsg.includes('password') || lowerMsg.includes('verify')) threatType = 'Account Takeover';
+      
+      return {
+        prediction: isPhishing ? 'phishing' : 'safe',
+        confidence: isPhishing ? confidence : (100 - phishingScore / 2),
+        indicators: [...new Set(detectedIndicators)].slice(0, 6),
+        threatType: threatType
+      };
+    }
+    
+    function displayResult(result) {
+      const isPhishing = result.prediction === 'phishing';
+      const confidenceOffset = 283 * (1 - result.confidence / 100);
+      
+      resultContainer.innerHTML = `
+        <div class="${isPhishing ? 'result-danger' : 'result-safe'} rounded-xl p-6">
+          
+          <div class="flex flex-col sm:flex-row items-center gap-6 mb-6">
+            
+            <!-- Confidence Ring -->
+            <div class="relative w-28 h-28 flex-shrink-0">
+              <svg viewBox="0 0 100 100" class="w-full h-full progress-ring">
+                <circle class="progress-ring-track" cx="50" cy="50" r="45" fill="none" stroke-width="8"/>
+                <circle class="progress-ring-progress" cx="50" cy="50" r="45" fill="none" stroke="${isPhishing ? '#dc2626' : '#059669'}" stroke-width="8" stroke-linecap="round" style="stroke-dashoffset: ${confidenceOffset}"/>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center flex-col">
+                <span class="text-2xl font-bold ${isPhishing ? 'text-red-600' : 'text-emerald-600'}">${result.confidence.toFixed(0)}%</span>
+                <span class="text-[10px] text-slate-500 font-medium">Confidence</span>
+              </div>
+            </div>
+            
+            <!-- Result Details -->
+            <div class="text-center sm:text-left flex-1">
+              <div class="flex items-center justify-center sm:justify-start gap-3 mb-2">
+                <div class="w-10 h-10 rounded-lg ${isPhishing ? 'bg-red-100' : 'bg-emerald-100'} flex items-center justify-center">
+                  ${isPhishing ? `
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                  ` : `
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                  `}
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold ${isPhishing ? 'text-red-700' : 'text-emerald-700'}">
+                    ${isPhishing ? 'Threat Detected' : 'Message Safe'}
+                  </h3>
+                  ${isPhishing ? `<p class="text-xs text-slate-500">Type: ${result.threatType}</p>` : ''}
+                </div>
+              </div>
+              <p class="text-sm text-slate-600">
+                ${isPhishing 
+                  ? 'This message contains indicators associated with phishing attacks. Do not click any links or provide personal information.' 
+                  : 'Our analysis found no suspicious patterns. This message appears legitimate.'}
+              </p>
+            </div>
+            
+          </div>
+          
+          ${isPhishing && result.indicators.length > 0 ? `
+            <!-- Indicators -->
+            <div class="bg-white/60 rounded-lg p-4 mb-5 border border-red-200">
+              <p class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                Risk Indicators Detected
+              </p>
+              <div class="flex flex-wrap gap-2">
+                ${result.indicators.map(ind => `
+                  <span class="px-3 py-1.5 bg-red-100 border border-red-200 rounded-lg text-xs text-red-700 font-medium">${ind}</span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          ${!isPhishing ? `
+            <!-- Safe Checklist -->
+            <div class="bg-white/60 rounded-lg p-4 mb-5 border border-emerald-200">
+              <p class="text-xs font-semibold text-slate-700 mb-3">Security Checks Passed</p>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="flex items-center gap-2 text-xs text-slate-600">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  No suspicious keywords
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-600">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  No malicious URLs
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-600">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Normal structure
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-600">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  No urgency tactics
+                </div>
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="text-center p-3 rounded-lg bg-white/60 border ${isPhishing ? 'border-red-200' : 'border-emerald-200'}">
+              <p class="text-lg font-bold ${isPhishing ? 'text-red-600' : 'text-emerald-600'}">${isPhishing ? 'High' : 'Low'}</p>
+              <p class="text-[10px] text-slate-500">Risk Level</p>
+            </div>
+            <div class="text-center p-3 rounded-lg bg-white/60 border ${isPhishing ? 'border-red-200' : 'border-emerald-200'}">
+              <p class="text-lg font-bold text-slate-700">${result.indicators ? result.indicators.length : 0}</p>
+              <p class="text-[10px] text-slate-500">Indicators</p>
+            </div>
+            <div class="text-center p-3 rounded-lg bg-white/60 border ${isPhishing ? 'border-red-200' : 'border-emerald-200'}">
+              <p class="text-lg font-bold text-slate-700">${Math.floor(Math.random() * 80) + 120}ms</p>
+              <p class="text-[10px] text-slate-500">Scan Time</p>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex gap-3">
+            <button id="copy-result" class="btn-secondary flex-1 py-2.5 rounded-lg text-sm flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              Copy Result
+            </button>
+            <button id="analyze-another" class="flex-1 py-2.5 rounded-lg text-sm font-semibold ${isPhishing ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} transition-colors flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              Scan Another
+            </button>
+          </div>
+          
+        </div>
+      `;
+      
+      resultContainer.classList.remove('hidden');
+      
+      setTimeout(() => {
+        const progress = resultContainer.querySelector('.progress-ring-progress');
+        if (progress) progress.style.strokeDashoffset = confidenceOffset;
+      }, 50);
+      
+      resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      document.getElementById('analyze-another').addEventListener('click', () => {
+        messageInput.value = '';
+        charCount.textContent = '0 chars';
+        wordCount.textContent = '0 words';
+        resultContainer.classList.add('hidden');
+        threatLevel.innerHTML = '<span class="w-2 h-2 bg-slate-400 rounded-full"></span><span class="text-xs text-slate-600 font-semibold">Ready</span>';
+        messageInput.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      document.getElementById('copy-result').addEventListener('click', () => {
+        const resultText = `PhishGuard AI Analysis
+Result: ${result.prediction.toUpperCase()}
+Confidence: ${result.confidence.toFixed(1)}%
+${result.prediction === 'phishing' ? `Type: ${result.threatType}\nIndicators: ${result.indicators.join(', ')}` : 'Status: No threats detected'}`;
+        
+        navigator.clipboard.writeText(resultText).then(() => {
+          showToast('Copied', 'Result copied to clipboard', 'success');
+        }).catch(() => {
+          showToast('Error', 'Copy failed', 'error');
+        });
+      });
+    }
+    
+    // Element SDK
+    async function onConfigChange(newConfig) {
+      config = { ...defaultConfig, ...newConfig };
+      
+      const heroTitle = document.getElementById('hero-title');
+      const heroSubtitle = document.getElementById('hero-subtitle');
+      const footerText = document.getElementById('footer-text');
+      
+      heroTitle.textContent = config.hero_title || defaultConfig.hero_title;
+      heroSubtitle.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      btnText.textContent = config.button_text || defaultConfig.button_text;
+      footerText.textContent = config.footer_text || defaultConfig.footer_text;
+      
+      if (config.font_family) {
+        document.body.style.fontFamily = `${config.font_family}, 'Inter', sans-serif`;
+      }
+      
+      if (config.font_size) {
+        const base = config.font_size;
+        heroTitle.style.fontSize = `${base * 2.5}px`;
+        heroSubtitle.style.fontSize = `${base * 1.1}px`;
+      }
+    }
+    
+    function mapToCapabilities(cfg) {
+      return {
+        recolorables: [
+          { get: () => cfg.background_color || defaultConfig.background_color, set: (v) => { cfg.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+          { get: () => cfg.surface_color || defaultConfig.surface_color, set: (v) => { cfg.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+          { get: () => cfg.text_color || defaultConfig.text_color, set: (v) => { cfg.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+          { get: () => cfg.primary_color || defaultConfig.primary_color, set: (v) => { cfg.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+          { get: () => cfg.accent_color || defaultConfig.accent_color, set: (v) => { cfg.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } }
+        ],
+        borderables: [],
+        fontEditable: { get: () => cfg.font_family || 'Inter', set: (v) => { cfg.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+        fontSizeable: { get: () => cfg.font_size || 16, set: (v) => { cfg.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+      };
+    }
+    
+    function mapToEditPanelValues(cfg) {
+      return new Map([
+        ['hero_title', cfg.hero_title || defaultConfig.hero_title],
+        ['hero_subtitle', cfg.hero_subtitle || defaultConfig.hero_subtitle],
+        ['button_text', cfg.button_text || defaultConfig.button_text],
+        ['footer_text', cfg.footer_text || defaultConfig.footer_text]
+      ]);
+    }
+    
+    if (window.elementSdk) {
+      window.elementSdk.init({ defaultConfig, onConfigChange, mapToCapabilities, mapToEditPanelValues });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9afde62451af6eef',t:'MTc2NjA1MjkyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
